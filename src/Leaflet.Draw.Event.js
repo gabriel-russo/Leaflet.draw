@@ -32,7 +32,7 @@ L.Draw.Event = {};
  * Triggered when a new vector or marker has been created.
  *
  */
-L.Draw.Event.CREATED = 'draw:created';
+L.Draw.Event.CREATED = "draw:created";
 
 /**
  * @event draw:edited: LayerGroup
@@ -45,14 +45,14 @@ L.Draw.Event.CREATED = 'draw:created';
  * @example
  * ```js
  *      map.on('draw:edited', function (e) {
-     *          var layers = e.layers;
-     *          layers.eachLayer(function (layer) {
-     *              //do whatever you want; most likely save back to db
-     *          });
-     *      });
+ *          var layers = e.layers;
+ *          layers.eachLayer(function (layer) {
+ *              //do whatever you want; most likely save back to db
+ *          });
+ *      });
  * ```
  */
-L.Draw.Event.EDITED = 'draw:edited';
+L.Draw.Event.EDITED = "draw:edited";
 
 /**
  * @event draw:deleted: LayerGroup
@@ -61,7 +61,7 @@ L.Draw.Event.EDITED = 'draw:edited';
  *
  * Triggered when layers have been removed (and saved) from the FeatureGroup.
  */
-L.Draw.Event.DELETED = 'draw:deleted';
+L.Draw.Event.DELETED = "draw:deleted";
 
 /**
  * @event draw:drawstart: String
@@ -70,7 +70,7 @@ L.Draw.Event.DELETED = 'draw:deleted';
  *
  * Triggered when the user has chosen to draw a particular vector or marker.
  */
-L.Draw.Event.DRAWSTART = 'draw:drawstart';
+L.Draw.Event.DRAWSTART = "draw:drawstart";
 
 /**
  * @event draw:drawstop: String
@@ -80,7 +80,7 @@ L.Draw.Event.DRAWSTART = 'draw:drawstart';
  * Triggered when the user has finished a particular vector or marker.
  */
 
-L.Draw.Event.DRAWSTOP = 'draw:drawstop';
+L.Draw.Event.DRAWSTOP = "draw:drawstop";
 
 /**
  * @event draw:drawvertex: LayerGroup
@@ -89,7 +89,7 @@ L.Draw.Event.DRAWSTOP = 'draw:drawstop';
  *
  * Triggered when a vertex is created on a polyline or polygon.
  */
-L.Draw.Event.DRAWVERTEX = 'draw:drawvertex';
+L.Draw.Event.DRAWVERTEX = "draw:drawvertex";
 
 /**
  * @event draw:editstart: String
@@ -99,7 +99,7 @@ L.Draw.Event.DRAWVERTEX = 'draw:drawvertex';
  * Triggered when the user starts edit mode by clicking the edit tool button.
  */
 
-L.Draw.Event.EDITSTART = 'draw:editstart';
+L.Draw.Event.EDITSTART = "draw:editstart";
 
 /**
  * @event draw:editmove: ILayer
@@ -108,7 +108,7 @@ L.Draw.Event.EDITSTART = 'draw:editstart';
  *
  * Triggered as the user moves a rectangle; circle or marker.
  */
-L.Draw.Event.EDITMOVE = 'draw:editmove';
+L.Draw.Event.EDITMOVE = "draw:editmove";
 
 /**
  * @event draw:editresize: ILayer
@@ -117,7 +117,7 @@ L.Draw.Event.EDITMOVE = 'draw:editmove';
  *
  * Triggered as the user resizes a rectangle or circle.
  */
-L.Draw.Event.EDITRESIZE = 'draw:editresize';
+L.Draw.Event.EDITRESIZE = "draw:editresize";
 
 /**
  * @event draw:editvertex: LayerGroup
@@ -126,7 +126,7 @@ L.Draw.Event.EDITRESIZE = 'draw:editresize';
  *
  * Triggered when a vertex is edited on a polyline or polygon.
  */
-L.Draw.Event.EDITVERTEX = 'draw:editvertex';
+L.Draw.Event.EDITVERTEX = "draw:editvertex";
 
 /**
  * @event draw:editstop: String
@@ -135,7 +135,7 @@ L.Draw.Event.EDITVERTEX = 'draw:editvertex';
  *
  * Triggered when the user has finshed editing (edit mode) and saves edits.
  */
-L.Draw.Event.EDITSTOP = 'draw:editstop';
+L.Draw.Event.EDITSTOP = "draw:editstop";
 
 /**
  * @event draw:deletestart: String
@@ -144,7 +144,7 @@ L.Draw.Event.EDITSTOP = 'draw:editstop';
  *
  * Triggered when the user starts remove mode by clicking the remove tool button.
  */
-L.Draw.Event.DELETESTART = 'draw:deletestart';
+L.Draw.Event.DELETESTART = "draw:deletestart";
 
 /**
  * @event draw:deletestop: String
@@ -153,25 +153,25 @@ L.Draw.Event.DELETESTART = 'draw:deletestart';
  *
  * Triggered when the user has finished removing shapes (remove mode) and saves.
  */
-L.Draw.Event.DELETESTOP = 'draw:deletestop';
+L.Draw.Event.DELETESTOP = "draw:deletestop";
 
 /**
  * @event draw:toolbaropened: String
  *
  * Triggered when a toolbar is opened.
  */
-L.Draw.Event.TOOLBAROPENED = 'draw:toolbaropened';
+L.Draw.Event.TOOLBAROPENED = "draw:toolbaropened";
 
 /**
  * @event draw:toolbarclosed: String
  *
  * Triggered when a toolbar is closed.
  */
-L.Draw.Event.TOOLBARCLOSED = 'draw:toolbarclosed';
+L.Draw.Event.TOOLBARCLOSED = "draw:toolbarclosed";
 
 /**
  * @event draw:markercontext: String
  *
  * Triggered when a marker is right clicked.
  */
-L.Draw.Event.MARKERCONTEXT = 'draw:markercontext';
+L.Draw.Event.MARKERCONTEXT = "draw:markercontext";
