@@ -1,4 +1,5 @@
-Copyright 2012-2017 Jon West, Jacob Toye, and Leaflet
+Copywright 2012-2017 Jon West, Jacob Toye, and Leaflet
+Copywright 2023-2023 Gabriel Russo
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

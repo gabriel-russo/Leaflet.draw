@@ -1,13 +1,18 @@
 # Leaflet.draw
+
+This fork of Leaflet.draw is a work in progress. It is intended to update to newest packages and Javascript standards.
+
+It is not intended to be a drop-in replacement for the original Leaflet.draw and will not be published. 
+
+This is a custom fork for my own needs.
+
+----
+
 Adds support for drawing and editing vectors and markers on [Leaflet maps](https://github.com/Leaflet/Leaflet).
 
-Supports [Leaflet](https://github.com/Leaflet/Leaflet/releases) 0.7.x and 1.0.0+ branches.
+Supports [Leaflet](https://github.com/Leaflet/Leaflet/releases) 1.0.0+ branches.
 
 Please check out our [Api Documentation](https://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html)
-
-#### Upgrading from Leaflet.draw 0.1
-
-Leaflet.draw 0.2.0 changes a LOT of things from 0.1. Please see [BREAKING CHANGES](https://github.com/Leaflet/Leaflet.draw/blob/master/BREAKINGCHANGES.md) for how to upgrade.
 
 ## In this readme
 
@@ -130,20 +135,22 @@ drawControl.setDrawingOptions({
 
 # Contributing
  
-## Testing
+## Building
 
-To test you can install the npm dependencies:
+To build you can install the npm dependencies:
 
     npm install
 
 and then use:
 
-    jake test
+    npm run build
+
+after that, you can get the code in `dist/` folder.
 
 ## Documentation
 
 Documentation is build with Leafdoc, to generate the documentation use
 
-    jake docs
+    npm run docs
 
 and the generated html documentation is saved to `./docs/leaflet-draw-latest.html`
