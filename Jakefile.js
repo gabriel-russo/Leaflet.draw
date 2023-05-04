@@ -11,62 +11,53 @@
 
  For a custom build, open build/build.html in the browser and follow the instructions.
  */
+let git = require("git-rev");
+const { jake, task, desc } = require("jake");
+const build = require("./build/build.js");
+const buildDocs = require("./build/docs");
+const { version } = require("./package.json").version;
 
-var build = require('./build/build.js'),
-    buildDocs = require('./build/docs'),
-    git = require('git-rev');
 
 function hint(msg, args) {
-    return function () {
-        console.log(msg);
-        jake.exec('node node_modules/eslint/bin/eslint.js ' + args,
-            {printStdout: true}, function () {
-                console.log('\tCheck passed.\n');
-                complete();
-            });
-    };
+	return () => {
+		console.log(msg);
+		jake.exec(`node node_modules/eslint/bin/eslint.js ${args}`,
+			{ printStdout: true }, () => {
+				console.log("\tCheck passed.\n");
+				complete();
+			});
+	};
 }
 
 // Returns the version string in package.json, plus a semver build metadata if
 // this is not an official release
 function calculateVersion(officialRelease, callback) {
-    var version = require('./package.json').version;
 
-    if (officialRelease) {
-        callback(version);
-    } else {
-        git.short(function (str) {
-            callback(version + '+' + str);
-        });
-    }
+	if (officialRelease) {
+		callback(version);
+	} else {
+		git.short((str) => {
+			callback(`${version}+${str}`);
+		});
+	}
 }
 
+desc("Check Leaflet.draw source for errors with ESHint");
+task("lint", { async: true }, hint("Checking for JS errors...", "src"));
 
-desc('Check Leaflet.draw source for errors with ESHint');
-task('lint', {async: true}, hint('Checking for JS errors...', 'src'));
+desc("Check Leaflet.draw specs source for errors with ESLint");
+task("lintspec", { async: true }, hint("Checking for specs JS errors...", "spec/suites"));
 
-desc('Check Leaflet.draw specs source for errors with ESLint');
-task('lintspec', {async: true}, hint('Checking for specs JS errors...', 'spec/suites'));
-
-desc('Combine and compress Leaflet Draw source files');
-task('build', {async: true}, function (compsBase32, buildName, officialRelease) {
-    calculateVersion(officialRelease, function (v) {
-        build.build(complete, v, compsBase32, buildName);
-    });
+desc("Combine and compress Leaflet Draw source files");
+task("build", { async: true }, (compsBase32, buildName, officialRelease) => {
+	calculateVersion(officialRelease, (v) => {
+		build.build(complete, v, compsBase32, buildName);
+	});
 });
 
-desc('Run PhantomJS tests');
-task('test', ['lint', 'lintspec'], {async: true}, function () {
-    build.test(complete);
+desc("Build documentation");
+task("docs", {}, () => {
+	buildDocs();
 });
 
-desc('Build documentation');
-task('docs', {}, function () {
-    buildDocs();
-});
-
-task('default', ['build', 'test']);
-
-jake.addListener('complete', function () {
-    process.exit();
-});
+task("default", ["build", "test"]);

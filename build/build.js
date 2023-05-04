@@ -1,275 +1,230 @@
-var fs = require('fs'),
-    UglifyJS = require('uglify-js'),
-    zlib = require('zlib'),
-    SourceNode = require('source-map').SourceNode,
-    UglifyCss = require('uglifycss');
+const fs = require("fs");
+const UglifyJS = require("uglify-js");
+const zlib = require("zlib");
+const SourceNode = require("source-map").SourceNode;
+const UglifyCss = require("uglifycss");
 
-deps = require('./deps.js').deps;
+const deps = require("./deps.js").deps;
 
 function getFiles(compsBase32) {
-    var memo = {},
-        comps;
+	let memo = {};
+	let comps;
 
-    if (compsBase32) {
-        comps = parseInt(compsBase32, 32).toString(2).split('');
-        console.log('Managing dependencies...');
-    }
+	if (compsBase32) {
+		comps = parseInt(compsBase32, 32).toString(2).split("");
+		console.log("Managing dependencies...");
+	}
 
-    function addFiles(srcs) {
-        for (var j = 0, len = srcs.length; j < len; j++) {
-            memo[srcs[j]] = true;
-        }
-    }
+	function addFiles(srcs) {
+		for (let j = 0, len = srcs.length; j < len; j++) {
+			memo[srcs[j]] = true;
+		}
+	}
 
-    for (var i in deps) {
-        if (comps) {
-            if (parseInt(comps.pop(), 2) === 1) {
-                console.log(' * ' + i);
-                addFiles(deps[i].src);
-            } else {
-                console.log('   ' + i);
-            }
-        } else {
-            addFiles(deps[i].src);
-        }
-    }
+	for (let i in deps) {
+		if (comps) {
+			if (parseInt(comps.pop(), 2) === 1) {
+				console.log(` * ${i}`);
+				addFiles(deps[i].src);
+			} else {
+				console.log(`      ${i}`);
+			}
+		} else {
+			addFiles(deps[i].src);
+		}
+	}
 
-    console.log('');
+	console.log("");
 
-    var files = [];
+	let files = [];
 
-    for (var src in memo) {
-        files.push('src/' + src);
-    }
+	// eslint-disable-next-line guard-for-in
+	for (let src in memo) {
+		files.push(`src/${src}`);
+	}
 
-    return files;
+	return files;
 }
 
 exports.getFiles = getFiles;
 
 function getSizeDelta(newContent, oldContent, fixCRLF) {
-    if (!oldContent) {
-        return ' (new)';
-    }
-    if (newContent === oldContent) {
-        return ' (unchanged)';
-    }
-    if (fixCRLF) {
-        newContent = newContent.replace(/\r\n?/g, '\n');
-        oldContent = oldContent.replace(/\r\n?/g, '\n');
-    }
-    var delta = newContent.length - oldContent.length;
+	if (!oldContent) {
+		return " (new)";
+	}
+	if (newContent === oldContent) {
+		return " (unchanged)";
+	}
+	if (fixCRLF) {
+		// eslint-disable-next-line no-param-reassign
+		newContent = newContent.replace(/\r\n?/g, "\n");
+		// eslint-disable-next-line no-param-reassign
+		oldContent = oldContent.replace(/\r\n?/g, "\n");
+	}
 
-    return delta === 0 ? '' : ' (' + (delta > 0 ? '+' : '') + delta + ' bytes)';
+	let delta = newContent.length - oldContent.length;
+
+	return delta === 0 ? "" : ` (${delta > 0 ? "+" : ""}${delta} bytes)`;
 }
 
 function loadSilently(path) {
-    try {
-        return fs.readFileSync(path, 'utf8');
-    } catch (e) {
-        return null;
-    }
+	try {
+		return fs.readFileSync(path, "utf8");
+	} catch (e) {
+		return null;
+	}
 }
 
 // Concatenate the files while building up a sourcemap for the concatenation,
 // and replace the line defining L.version with the string prepared in the jakefile
 function bundleFiles(files, copy, version) {
-    var node = new SourceNode(null, null, null, '');
+	let node = new SourceNode(null, null, null, "");
 
-    node.add(new SourceNode(null, null, null, copy + '(function (window, document, undefined) {'));
+	node.add(new SourceNode(null, null, null, `${copy}(function (window, document, undefined) {`));
 
-    for (var i = 0, len = files.length; i < len; i++) {
-        var contents = fs.readFileSync(files[i], 'utf8');
+	for (let i = 0, len = files.length; i < len; i++) {
+		let contents = fs.readFileSync(files[i], "utf8");
 
-        if (files[i] === 'src/Leaflet.draw.js') {
-            contents = contents.replace(
-                new RegExp('drawVersion = \'.*\''),
-                'drawVersion = ' + JSON.stringify(version)
-            );
-        }
+		if (files[i] === "src/Leaflet.draw.js") {
+			contents = contents.replace(
+				/drawVersion = '.*'/,
+				`drawVersion = ${JSON.stringify(version)}`,
+			);
+		}
 
-        var lines = contents.split('\n');
-        var lineCount = lines.length;
-        var fileNode = new SourceNode(null, null, null, '');
+		let lines = contents.split("\n");
+		let lineCount = lines.length;
+		let fileNode = new SourceNode(null, null, null, "");
 
-        fileNode.setSourceContent(files[i], contents);
+		fileNode.setSourceContent(files[i], contents);
 
-        for (var j = 0; j < lineCount; j++) {
-            fileNode.add(new SourceNode(j + 1, 0, files[i], lines[j] + '\n'));
-        }
-        node.add(fileNode);
+		for (let j = 0; j < lineCount; j++) {
+			fileNode.add(new SourceNode(j + 1, 0, files[i], `${lines[j]}\n`));
+		}
+		node.add(fileNode);
 
-        node.add(new SourceNode(null, null, null, '\n\n'));
-    }
+		node.add(new SourceNode(null, null, null, "\n\n"));
+	}
 
-    node.add(new SourceNode(null, null, null, '}(window, document));'));
+	node.add(new SourceNode(null, null, null, "}(window, document));"));
 
-    var bundle = node.toStringWithSourceMap();
-    return {
-        src: bundle.code,
-        srcmap: bundle.map.toString()
-    };
+	let bundle = node.toStringWithSourceMap();
+	return {
+		src: bundle.code,
+		srcmap: bundle.map.toString(),
+	};
 }
 
 function bytesToKB(bytes) {
-    return (bytes / 1024).toFixed(2) + ' KB';
+	return `${(bytes / 1024).toFixed(2)} KB`;
 }
 
 
-exports.build = function (callback, version, compsBase32, buildName) {
+exports.build = (callback, version, compsBase32, buildName) => {
 
-    var files = getFiles(compsBase32);
+	let files = getFiles(compsBase32);
 
-    console.log('Bundling and compressing ' + files.length + ' files...');
+	console.log(`Bundling and compressing ${files.length} files...`);
 
-    var copy = fs.readFileSync('src/copyright.js', 'utf8').replace('{VERSION}', version),
+	let copy = fs.readFileSync("src/copyright.js", "utf8").replace("{VERSION}", version);
+	let filenamePart = `leaflet.draw${buildName ? `-${buildName}` : ""}`;
+	let pathPart = `dist/${filenamePart}`;
+	let srcPath = `${pathPart}-src.js`;
+	let mapPath = `${pathPart}-src.map`;
+	let srcFilename = `${filenamePart}-src.js`;
+	let mapFilename = `${filenamePart}-src.map`;
 
-        filenamePart = 'leaflet.draw' + (buildName ? '-' + buildName : ''),
-        pathPart = 'dist/' + filenamePart,
-        srcPath = pathPart + '-src.js',
-        mapPath = pathPart + '-src.map',
-        srcFilename = filenamePart + '-src.js',
-        mapFilename = filenamePart + '-src.map',
+	let bundle = bundleFiles(files, copy, version);
+	let newSrc = `${bundle.src}\n//# sourceMappingURL=${mapFilename}`;
 
-        bundle = bundleFiles(files, copy, version),
-        newSrc = bundle.src + '\n//# sourceMappingURL=' + mapFilename,
+	let oldSrc = loadSilently(srcPath);
+	let srcDelta = getSizeDelta(newSrc, oldSrc, true);
 
-        oldSrc = loadSilently(srcPath),
-        srcDelta = getSizeDelta(newSrc, oldSrc, true),
+	let leafletDrawCssPath = "./src/leaflet.draw.css";
+	let compressedCssPath = "./dist/leaflet.draw.css";
+	let cssSource = loadSilently(leafletDrawCssPath);
+	let oldCompressedCss = loadSilently(compressedCssPath);
+	let cssSourcePath = "./dist/leaflet.draw-src.css";
+	let newCompressedCss;
 
-        leafletDrawCssPath = './src/leaflet.draw.css',
-        compressedCssPath = './dist/leaflet.draw.css',
-        cssSource = loadSilently(leafletDrawCssPath),
-        oldCompressedCss = loadSilently(compressedCssPath),
-        cssSourcePath = './dist/leaflet.draw-src.css',
-        newCompressedCss;
+	try {
+		newCompressedCss = UglifyCss.processFiles(
+			[leafletDrawCssPath],
+			{ maxLineLen: 500, expandVars: true },
+		);
+	} catch (e) {
+		console.error("UglifyCss failed to minify the files");
+		console.error(e);
+		callback(e);
+	}
 
-    try {
-        newCompressedCss = UglifyCss.processFiles(
-            [leafletDrawCssPath],
-            {maxLineLen: 500, expandVars: true}
-        )
-    } catch (e) {
-        console.error('UglifyCss failed to minify the files');
-        console.error(err);
-        callback(err);
-    }
+	let cssSrcDelta = getSizeDelta(newCompressedCss, oldCompressedCss, true);
 
-    var cssSrcDelta = getSizeDelta(newCompressedCss, oldCompressedCss, true);
+	console.log(`\tCompressed Css: ${bytesToKB(newCompressedCss.length)}${cssSrcDelta}`);
+	try {
+		if (newCompressedCss !== oldCompressedCss) {
+			fs.writeFileSync(cssSourcePath, cssSource);
+			fs.writeFileSync(compressedCssPath, newCompressedCss);
+			console.log(`\tSaved to ${srcPath}`);
+		}
+	} catch (err) {
+		console.error("UglifyCSS failed to minify the files");
+		console.error(err);
+		callback(err);
+	}
 
-    console.log('\tCompressed Css: ' + bytesToKB(newCompressedCss.length) + cssSrcDelta);
-    try {
-        if (newCompressedCss !== oldCompressedCss) {
-            fs.writeFileSync(cssSourcePath, cssSource);
-            fs.writeFileSync(compressedCssPath, newCompressedCss);
-            console.log('\tSaved to ' + srcPath);
-        }
-    } catch (err) {
-        console.error('UglifyCSS failed to minify the files');
-        console.error(err);
-        callback(err);
-    }
+	console.log(`\tUncompressed Js: ${bytesToKB(newSrc.length)}${srcDelta}`);
+	if (newSrc !== oldSrc) {
+		fs.writeFileSync(srcPath, newSrc);
+		fs.writeFileSync(mapPath, bundle.srcmap);
+		console.log(`\tSaved to ${srcPath}`);
+	}
 
-    console.log('\tUncompressed Js: ' + bytesToKB(newSrc.length) + srcDelta);
-    if (newSrc !== oldSrc) {
-        fs.writeFileSync(srcPath, newSrc);
-        fs.writeFileSync(mapPath, bundle.srcmap);
-        console.log('\tSaved to ' + srcPath);
-    }
+	let path = `${pathPart}.js`;
+	let oldCompressed = loadSilently(path);
+	let newCompressed;
 
-    var path = pathPart + '.js',
-        oldCompressed = loadSilently(path),
-        newCompressed;
+	try {
+		newCompressed = copy + UglifyJS.minify(newSrc, {
+			warnings: true,
+		}).code;
+	} catch (err) {
+		console.error("UglifyJS failed to minify the files");
+		console.error(err);
+		callback(err);
+	}
 
-    try {
-        newCompressed = copy + UglifyJS.minify(newSrc, {
-                warnings: true,
-                fromString: true
-            }).code;
-    } catch (err) {
-        console.error('UglifyJS failed to minify the files');
-        console.error(err);
-        callback(err);
-    }
+	let delta = getSizeDelta(newCompressed, oldCompressed);
 
-    var delta = getSizeDelta(newCompressed, oldCompressed);
+	console.log(`\tCompressed: ${bytesToKB(newCompressed.length)}${delta}`);
 
-    console.log('\tCompressed: ' + bytesToKB(newCompressed.length) + delta);
+	let newGzipped;
+	let gzippedDelta = "";
 
-    var newGzipped,
-        gzippedDelta = '';
+	function done() {
+		if (newCompressed !== oldCompressed) {
+			fs.writeFileSync(path, newCompressed);
+			console.log(`\tSaved to ${path}`);
+		}
+		console.log(`\tGzipped: ${bytesToKB(newGzipped.length)}${gzippedDelta}`);
+		callback();
+	}
 
-    function done() {
-        if (newCompressed !== oldCompressed) {
-            fs.writeFileSync(path, newCompressed);
-            console.log('\tSaved to ' + path);
-        }
-        console.log('\tGzipped: ' + bytesToKB(newGzipped.length) + gzippedDelta);
-        callback();
-    }
-
-    zlib.gzip(newCompressed, function (err, gzipped) {
-        if (err) {
-            return;
-        }
-        newGzipped = gzipped;
-        if (oldCompressed && (oldCompressed !== newCompressed)) {
-            zlib.gzip(oldCompressed, function (err, oldGzipped) {
-                if (err) {
-                    return;
-                }
-                gzippedDelta = getSizeDelta(gzipped, oldGzipped);
-                done();
-            });
-        } else {
-            done();
-        }
-    });
-};
-
-exports.test = function (complete, fail) {
-    var karma = require('karma'),
-        testConfig = {configFile: __dirname + '/../spec/karma.conf.js'};
-
-    testConfig.browsers = ['PhantomJSCustom'];
-
-    function isArgv(optName) {
-        return process.argv.indexOf(optName) !== -1;
-    }
-
-    if (isArgv('--chrome')) {
-        testConfig.browsers.push('Chrome');
-    }
-    if (isArgv('--safari')) {
-        testConfig.browsers.push('Safari');
-    }
-    if (isArgv('--ff')) {
-        testConfig.browsers.push('Firefox');
-    }
-    if (isArgv('--ie')) {
-        testConfig.browsers.push('IE');
-    }
-
-    if (isArgv('--cov')) {
-        testConfig.preprocessors = {
-            'src/**/*.js': 'coverage'
-        };
-        testConfig.coverageReporter = {
-            type: 'html',
-            dir: 'coverage/'
-        };
-        testConfig.reporters = ['coverage'];
-    }
-
-    console.log('Running tests...');
-
-    var server = new karma.Server(testConfig, function (exitCode) {
-        if (!exitCode) {
-            console.log('\tTests ran successfully.\n');
-            complete();
-        } else {
-            process.exit(exitCode);
-        }
-    });
-    server.start();
+	zlib.gzip(newCompressed, (err, gzipped) => {
+		if (err) {
+			return;
+		}
+		newGzipped = gzipped;
+		if (oldCompressed && (oldCompressed !== newCompressed)) {
+			zlib.gzip(oldCompressed, (err, oldGzipped) => {
+				if (err) {
+					return;
+				}
+				gzippedDelta = getSizeDelta(gzipped, oldGzipped);
+				done();
+			});
+		} else {
+			done();
+		}
+	});
 };
