@@ -1,5 +1,5 @@
 {
-  "name": "neo-leaflet-draw",
+  "name": "leaflet-draw",
   "version": "2.0.0",
   "description": "Vector drawing plugin for Leaflet",
   "dependencies": {
@@ -11,8 +11,6 @@
     "jake": ">=8.0.15",
     "leafdoc": ">=1.4.0",
     "leaflet": ">=1.0.1",
-    "phantomjs-prebuilt": ">=2.1.16",
-    "prosthetic-hand": ">=1.3.1",
     "source-map": ">=0.7.4",
     "uglify-js": ">=2.8.29",
     "uglifycss": ">=0.0.25"

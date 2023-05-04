@@ -10,6 +10,7 @@
 	},
 	"rules": {
 		"import/extensions": 0,
+		"no-underscore-dangle": 0,
 		"prefer-const": 0,
 		"no-restricted-syntax": "off",
 		"no-plusplus": "off",
