@@ -8,7 +8,7 @@ L.Control.Draw = L.Control.extend({
 	options: {
 		position: "topleft",
 		draw: {},
-		edit: false,
+		edit: false
 	},
 
 	// @method initialize(): void
@@ -102,10 +102,10 @@ L.Control.Draw = L.Control.extend({
 				this._toolbars[toolbarId].disable();
 			}
 		}
-	},
+	}
 });
 
 L.Map.mergeOptions({
 	drawControlTooltips: true,
-	drawControl: false,
+	drawControl: false
 });
