@@ -5,7 +5,7 @@
  */
 L.Draw.Polyline = L.Draw.Feature.extend({
 	statics: {
-		TYPE: 'polyline'
+		TYPE: "polyline"
 	},
 
 	Poly: L.Polyline,
@@ -14,22 +14,22 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		allowIntersection: true,
 		repeatMode: false,
 		drawError: {
-			color: '#b00b00',
+			color: "#b00b00",
 			timeout: 2500
 		},
 		icon: new L.DivIcon({
 			iconSize: new L.Point(8, 8),
-			className: 'leaflet-div-icon leaflet-editing-icon'
+			className: "leaflet-div-icon leaflet-editing-icon"
 		}),
 		touchIcon: new L.DivIcon({
 			iconSize: new L.Point(20, 20),
-			className: 'leaflet-div-icon leaflet-editing-icon leaflet-touch-icon'
+			className: "leaflet-div-icon leaflet-editing-icon leaflet-touch-icon"
 		}),
 		guidelineDistance: 20,
 		maxGuideLineLength: 4000,
 		shapeOptions: {
 			stroke: true,
-			color: '#3388ff',
+			color: "#3388ff",
 			weight: 4,
 			opacity: 0.5,
 			fill: false,
@@ -45,7 +45,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	},
 
 	// @method initialize(): void
-	initialize: function (map, options) {
+	initialize(map, options) {
 		// if touch, switch to touch icon
 		if (L.Browser.touch) {
 			this.options.icon = this.options.touchIcon;
@@ -67,7 +67,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 	// @method addHooks(): void
 	// Add listener hooks to this handler
-	addHooks: function () {
+	addHooks() {
 		L.Draw.Feature.prototype.addHooks.call(this);
 		if (this._map) {
 			this._markers = [];
@@ -87,7 +87,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			if (!this._mouseMarker) {
 				this._mouseMarker = L.marker(this._map.getCenter(), {
 					icon: L.divIcon({
-						className: 'leaflet-mouse-marker',
+						className: "leaflet-mouse-marker",
 						iconAnchor: [20, 20],
 						iconSize: [40, 40]
 					}),
@@ -97,25 +97,25 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			}
 
 			this._mouseMarker
-				.on('mouseout', this._onMouseOut, this)
-				.on('mousemove', this._onMouseMove, this) // Necessary to prevent 0.8 stutter
-				.on('mousedown', this._onMouseDown, this)
-				.on('mouseup', this._onMouseUp, this) // Necessary for 0.8 compatibility
+				.on("mouseout", this._onMouseOut, this)
+				.on("mousemove", this._onMouseMove, this) // Necessary to prevent 0.8 stutter
+				.on("mousedown", this._onMouseDown, this)
+				.on("mouseup", this._onMouseUp, this) // Necessary for 0.8 compatibility
 				.addTo(this._map);
 
 			this._map
-				.on('mouseup', this._onMouseUp, this) // Necessary for 0.7 compatibility
-				.on('mousemove', this._onMouseMove, this)
-				.on('zoomlevelschange', this._onZoomEnd, this)
-				.on('touchstart', this._onTouch, this)
-				.on('zoomend', this._onZoomEnd, this);
+				.on("mouseup", this._onMouseUp, this) // Necessary for 0.7 compatibility
+				.on("mousemove", this._onMouseMove, this)
+				.on("zoomlevelschange", this._onZoomEnd, this)
+				.on("touchstart", this._onTouch, this)
+				.on("zoomend", this._onZoomEnd, this);
 
 		}
 	},
 
 	// @method removeHooks(): void
 	// Remove listener hooks from this handler.
-	removeHooks: function () {
+	removeHooks() {
 		L.Draw.Feature.prototype.removeHooks.call(this);
 
 		this._clearHideErrorTimeout();
@@ -131,10 +131,10 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		delete this._poly;
 
 		this._mouseMarker
-			.off('mousedown', this._onMouseDown, this)
-			.off('mouseout', this._onMouseOut, this)
-			.off('mouseup', this._onMouseUp, this)
-			.off('mousemove', this._onMouseMove, this);
+			.off("mousedown", this._onMouseDown, this)
+			.off("mouseout", this._onMouseOut, this)
+			.off("mouseup", this._onMouseUp, this)
+			.off("mousemove", this._onMouseMove, this);
 		this._map.removeLayer(this._mouseMarker);
 		delete this._mouseMarker;
 
@@ -142,26 +142,26 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		this._clearGuides();
 
 		this._map
-			.off('mouseup', this._onMouseUp, this)
-			.off('mousemove', this._onMouseMove, this)
-			.off('zoomlevelschange', this._onZoomEnd, this)
-			.off('zoomend', this._onZoomEnd, this)
-			.off('touchstart', this._onTouch, this)
-			.off('click', this._onTouch, this);
+			.off("mouseup", this._onMouseUp, this)
+			.off("mousemove", this._onMouseMove, this)
+			.off("zoomlevelschange", this._onZoomEnd, this)
+			.off("zoomend", this._onZoomEnd, this)
+			.off("touchstart", this._onTouch, this)
+			.off("click", this._onTouch, this);
 	},
 
 	// @method deleteLastVertex(): void
 	// Remove the last vertex from the polyline, removes polyline from map if only one point exists.
-	deleteLastVertex: function () {
+	deleteLastVertex() {
 		if (this._markers.length <= 1) {
 			return;
 		}
 
-		var lastMarker = this._markers.pop(),
-			poly = this._poly,
-			// Replaces .spliceLatLngs()
-			latlngs = poly.getLatLngs(),
-			latlng = latlngs.splice(-1, 1)[0];
+		let lastMarker = this._markers.pop();
+		let poly = this._poly;
+		// Replaces .spliceLatLngs()
+		let latlngs = poly.getLatLngs();
+		let latlng = latlngs.splice(-1, 1)[0];
 		this._poly.setLatLngs(latlngs);
 
 		this._markerGroup.removeLayer(lastMarker);
@@ -175,14 +175,14 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 	// @method addVertex(): void
 	// Add a vertex to the end of the polyline
-	addVertex: function (latlng) {
-		var markersLength = this._markers.length;
+	addVertex(latlng) {
+		let markersLength = this._markers.length;
 		// markersLength must be greater than or equal to 2 before intersections can occur
 		if (markersLength >= 2 && !this.options.allowIntersection && this._poly.newLatLngIntersects(latlng)) {
 			this._showErrorTooltip();
 			return;
 		}
-		else if (this._errorShown) {
+		if (this._errorShown) {
 			this._hideErrorTooltip();
 		}
 
@@ -199,7 +199,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 	// @method completeShape(): void
 	// Closes the polyline between the first and last points
-	completeShape: function () {
+	completeShape() {
 		if (this._markers.length <= 1 || !this._shapeIsValid()) {
 			return;
 		}
@@ -212,9 +212,9 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		}
 	},
 
-	_finishShape: function () {
-		var latlngs = this._poly._defaultShape ? this._poly._defaultShape() : this._poly.getLatLngs();
-		var intersects = this._poly.newLatLngIntersects(latlngs[latlngs.length - 1]);
+	_finishShape() {
+		let latlngs = this._poly._defaultShape ? this._poly._defaultShape() : this._poly.getLatLngs();
+		let intersects = this._poly.newLatLngIntersects(latlngs[latlngs.length - 1]);
 
 		if ((!this.options.allowIntersection && intersects) || !this._shapeIsValid()) {
 			this._showErrorTooltip();
@@ -230,19 +230,19 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 	// Called to verify the shape is valid when the user tries to finish it
 	// Return false if the shape is not valid
-	_shapeIsValid: function () {
+	_shapeIsValid() {
 		return true;
 	},
 
-	_onZoomEnd: function () {
+	_onZoomEnd() {
 		if (this._markers !== null) {
 			this._updateGuide();
 		}
 	},
 
-	_onMouseMove: function (e) {
-		var newPos = this._map.mouseEventToLayerPoint(e.originalEvent);
-		var latlng = this._map.layerPointToLatLng(newPos);
+	_onMouseMove(e) {
+		let newPos = this._map.mouseEventToLayerPoint(e.originalEvent);
+		let latlng = this._map.layerPointToLatLng(newPos);
 
 		// Save latlng
 		// should this be moved to _updateGuide() ?
@@ -259,8 +259,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		L.DomEvent.preventDefault(e.originalEvent);
 	},
 
-	_vertexChanged: function (latlng, added) {
-		this._map.fire(L.Draw.Event.DRAWVERTEX, {layers: this._markerGroup});
+	_vertexChanged(latlng, added) {
+		this._map.fire(L.Draw.Event.DRAWVERTEX, { layers: this._markerGroup });
 		this._updateFinishHandler();
 
 		this._updateRunningMeasure(latlng, added);
@@ -270,36 +270,36 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		this._updateTooltip();
 	},
 
-	_onMouseDown: function (e) {
+	_onMouseDown(e) {
 		if (!this._clickHandled && !this._touchHandled && !this._disableMarkers) {
 			this._onMouseMove(e);
 			this._clickHandled = true;
 			this._disableNewMarkers();
-			var originalEvent = e.originalEvent;
-			var clientX = originalEvent.clientX;
-			var clientY = originalEvent.clientY;
+			let { originalEvent } = e;
+			let { clientX } = originalEvent;
+			let { clientY } = originalEvent;
 			this._startPoint.call(this, clientX, clientY);
 		}
 	},
 
-	_startPoint: function (clientX, clientY) {
+	_startPoint(clientX, clientY) {
 		this._mouseDownOrigin = L.point(clientX, clientY);
 	},
 
-	_onMouseUp: function (e) {
-		var originalEvent = e.originalEvent;
-		var clientX = originalEvent.clientX;
-		var clientY = originalEvent.clientY;
+	_onMouseUp(e) {
+		let { originalEvent } = e;
+		let { clientX } = originalEvent;
+		let { clientY } = originalEvent;
 		this._endPoint.call(this, clientX, clientY, e);
 		this._clickHandled = null;
 	},
 
-	_endPoint: function (clientX, clientY, e) {
+	_endPoint(clientX, clientY, e) {
 		if (this._mouseDownOrigin) {
-			var dragCheckDistance = L.point(clientX, clientY)
+			let dragCheckDistance = L.point(clientX, clientY)
 				.distanceTo(this._mouseDownOrigin);
-			var lastPtDistance = this._calculateFinishDistance(e.latlng);
-			if (this.options.maxPoints > 1 && this.options.maxPoints == this._markers.length + 1) {
+			let lastPtDistance = this._calculateFinishDistance(e.latlng);
+			if (this.options.maxPoints > 1 && this.options.maxPoints === this._markers.length + 1) {
 				this.addVertex(e.latlng);
 				this._finishShape();
 			} else if (lastPtDistance < 10 && L.Browser.touch) {
@@ -314,10 +314,10 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 	// ontouch prevented by clickHandled flag because some browsers fire both click/touch events,
 	// causing unwanted behavior
-	_onTouch: function (e) {
-		var originalEvent = e.originalEvent;
-		var clientX;
-		var clientY;
+	_onTouch(e) {
+		let { originalEvent } = e;
+		let clientX;
+		let clientY;
 		if (originalEvent.touches && originalEvent.touches[0] && !this._clickHandled && !this._touchHandled && !this._disableMarkers) {
 			clientX = originalEvent.touches[0].clientX;
 			clientY = originalEvent.touches[0].clientY;
@@ -330,7 +330,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		this._clickHandled = null;
 	},
 
-	_onMouseOut: function () {
+	_onMouseOut() {
 		if (this._tooltip) {
 			this._tooltip._onMouseOut.call(this._tooltip);
 		}
@@ -340,23 +340,23 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	// of the closing point (first point for shapes, last point for lines)
 	// this is semi-ugly code but the only reliable way i found to get the job done
 	// note: calculating point.distanceTo between mouseDownOrigin and last marker did NOT work
-	_calculateFinishDistance: function (potentialLatLng) {
-		var lastPtDistance;
+	_calculateFinishDistance(potentialLatLng) {
+		let lastPtDistance;
 		if (this._markers.length > 0) {
-			var finishMarker;
+			let finishMarker;
 			if (this.type === L.Draw.Polyline.TYPE) {
 				finishMarker = this._markers[this._markers.length - 1];
 			} else if (this.type === L.Draw.Polygon.TYPE) {
-				finishMarker = this._markers[0];
+				[finishMarker] = this._markers;
 			} else {
 				return Infinity;
 			}
-			var lastMarkerPoint = this._map.latLngToContainerPoint(finishMarker.getLatLng()),
-				potentialMarker = new L.Marker(potentialLatLng, {
-					icon: this.options.icon,
-					zIndexOffset: this.options.zIndexOffset * 2
-				});
-			var potentialMarkerPint = this._map.latLngToContainerPoint(potentialMarker.getLatLng());
+			let lastMarkerPoint = this._map.latLngToContainerPoint(finishMarker.getLatLng());
+			let potentialMarker = new L.Marker(potentialLatLng, {
+				icon: this.options.icon,
+				zIndexOffset: this.options.zIndexOffset * 2
+			});
+			let potentialMarkerPint = this._map.latLngToContainerPoint(potentialMarker.getLatLng());
 			lastPtDistance = lastMarkerPoint.distanceTo(potentialMarkerPint);
 		} else {
 			lastPtDistance = Infinity;
@@ -364,21 +364,21 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		return lastPtDistance;
 	},
 
-	_updateFinishHandler: function () {
-		var markerCount = this._markers.length;
+	_updateFinishHandler() {
+		let markerCount = this._markers.length;
 		// The last marker should have a click handler to close the polyline
 		if (markerCount > 1) {
-			this._markers[markerCount - 1].on('click', this._finishShape, this);
+			this._markers[markerCount - 1].on("click", this._finishShape, this);
 		}
 
 		// Remove the old marker click handler (as only the last point should close the polyline)
 		if (markerCount > 2) {
-			this._markers[markerCount - 2].off('click', this._finishShape, this);
+			this._markers[markerCount - 2].off("click", this._finishShape, this);
 		}
 	},
 
-	_createMarker: function (latlng) {
-		var marker = new L.Marker(latlng, {
+	_createMarker(latlng) {
+		let marker = new L.Marker(latlng, {
 			icon: this.options.icon,
 			zIndexOffset: this.options.zIndexOffset * 2
 		});
@@ -388,13 +388,13 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		return marker;
 	},
 
-	_updateGuide: function (newPos) {
-		var markerCount = this._markers ? this._markers.length : 0;
+	_updateGuide(newPos) {
+		let markerCount = this._markers ? this._markers.length : 0;
 
 		if (markerCount > 0) {
 			newPos = newPos || this._map.latLngToLayerPoint(this._currentLatLng);
 
-			// draw the guide line
+			// draw the guideline
 			this._clearGuides();
 			this._drawGuide(
 				this._map.latLngToLayerPoint(this._markers[markerCount - 1].getLatLng()),
@@ -403,8 +403,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		}
 	},
 
-	_updateTooltip: function (latLng) {
-		var text = this._getTooltipText();
+	_updateTooltip(latLng) {
+		let text = this._getTooltipText();
 
 		if (latLng) {
 			this._tooltip.updatePosition(latLng);
@@ -415,34 +415,34 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		}
 	},
 
-	_drawGuide: function (pointA, pointB) {
-		var length = Math.floor(Math.sqrt(Math.pow((pointB.x - pointA.x), 2) + Math.pow((pointB.y - pointA.y), 2))),
-			guidelineDistance = this.options.guidelineDistance,
-			maxGuideLineLength = this.options.maxGuideLineLength,
-			// Only draw a guideline with a max length
-			i = length > maxGuideLineLength ? length - maxGuideLineLength : guidelineDistance,
-			fraction,
-			dashPoint,
-			dash;
+	_drawGuide(pointA, pointB) {
+		let length = Math.floor(Math.sqrt((pointB.x - pointA.x) ** 2 + (pointB.y - pointA.y) ** 2));
+		let { guidelineDistance } = this.options;
+		let { maxGuideLineLength } = this.options;
+		// Only draw a guideline with a max length
+		let i = length > maxGuideLineLength ? length - maxGuideLineLength : guidelineDistance;
+		let fraction;
+		let dashPoint;
+		let dash;
 
-		//create the guides container if we haven't yet
+		// create the guides container if we haven't yet
 		if (!this._guidesContainer) {
-			this._guidesContainer = L.DomUtil.create('div', 'leaflet-draw-guides', this._overlayPane);
+			this._guidesContainer = L.DomUtil.create("div", "leaflet-draw-guides", this._overlayPane);
 		}
 
-		//draw a dash every GuildeLineDistance
+		// draw a dash every GuildeLineDistance
 		for (; i < length; i += this.options.guidelineDistance) {
-			//work out fraction along line we are
+			// work out fraction along line we are
 			fraction = i / length;
 
-			//calculate new x,y point
+			// calculate new x,y point
 			dashPoint = {
 				x: Math.floor((pointA.x * (1 - fraction)) + (fraction * pointB.x)),
 				y: Math.floor((pointA.y * (1 - fraction)) + (fraction * pointB.y))
 			};
 
-			//add guide dash to guide container
-			dash = L.DomUtil.create('div', 'leaflet-draw-guide-dash', this._guidesContainer);
+			// add guide dash to guide container
+			dash = L.DomUtil.create("div", "leaflet-draw-guide-dash", this._guidesContainer);
 			dash.style.backgroundColor =
 				!this._errorShown ? this.options.shapeOptions.color : this.options.drawError.color;
 
@@ -450,16 +450,16 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		}
 	},
 
-	_updateGuideColor: function (color) {
+	_updateGuideColor(color) {
 		if (this._guidesContainer) {
-			for (var i = 0, l = this._guidesContainer.childNodes.length; i < l; i++) {
+			for (let i = 0, l = this._guidesContainer.childNodes.length; i < l; i++) {
 				this._guidesContainer.childNodes[i].style.backgroundColor = color;
 			}
 		}
 	},
 
 	// removes all child elements (guide dashes) from the guides container
-	_clearGuides: function () {
+	_clearGuides() {
 		if (this._guidesContainer) {
 			while (this._guidesContainer.firstChild) {
 				this._guidesContainer.removeChild(this._guidesContainer.firstChild);
@@ -467,15 +467,16 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		}
 	},
 
-	_getTooltipText: function () {
-		var showLength = this.options.showLength,
-			labelText, distanceStr;
+	_getTooltipText() {
+		let { showLength } = this.options;
+		let labelText;
+		let distanceStr;
 		if (this._markers.length === 0) {
 			labelText = {
 				text: L.drawLocal.draw.handlers.polyline.tooltip.start
 			};
 		} else {
-			distanceStr = showLength ? this._getMeasurementString() : '';
+			distanceStr = showLength ? this._getMeasurementString() : "";
 
 			if (this._markers.length === 1) {
 				labelText = {
@@ -492,9 +493,10 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		return labelText;
 	},
 
-	_updateRunningMeasure: function (latlng, added) {
-		var markersLength = this._markers.length,
-			previousMarkerIndex, distance;
+	_updateRunningMeasure(latlng, added) {
+		let markersLength = this._markers.length;
+		let previousMarkerIndex;
+		let distance;
 
 		if (this._markers.length === 1) {
 			this._measurementRunningTotal = 0;
@@ -512,10 +514,10 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		}
 	},
 
-	_getMeasurementString: function () {
-		var currentLatLng = this._currentLatLng,
-			previousLatLng = this._markers[this._markers.length - 1].getLatLng(),
-			distance;
+	_getMeasurementString() {
+		let currentLatLng = this._currentLatLng;
+		let previousLatLng = this._markers[this._markers.length - 1].getLatLng();
+		let distance;
 
 		// Calculate the distance from the last fixed point to the mouse position based on the version
 		if (L.GeometryUtil.isVersion07x()) {
@@ -527,24 +529,24 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 		return L.GeometryUtil.readableDistance(distance, this.options.metric, this.options.feet, this.options.nautic, this.options.precision);
 	},
 
-	_showErrorTooltip: function () {
+	_showErrorTooltip() {
 		this._errorShown = true;
 
 		// Update tooltip
 		this._tooltip
 			.showAsError()
-			.updateContent({text: this.options.drawError.message});
+			.updateContent({ text: this.options.drawError.message });
 
 		// Update shape
 		this._updateGuideColor(this.options.drawError.color);
-		this._poly.setStyle({color: this.options.drawError.color});
+		this._poly.setStyle({ color: this.options.drawError.color });
 
 		// Hide the error after 2 seconds
 		this._clearHideErrorTimeout();
 		this._hideErrorTimeout = setTimeout(L.Util.bind(this._hideErrorTooltip, this), this.options.drawError.timeout);
 	},
 
-	_hideErrorTooltip: function () {
+	_hideErrorTooltip() {
 		this._errorShown = false;
 
 		this._clearHideErrorTimeout();
@@ -556,10 +558,10 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 		// Revert shape
 		this._updateGuideColor(this.options.shapeOptions.color);
-		this._poly.setStyle({color: this.options.shapeOptions.color});
+		this._poly.setStyle({ color: this.options.shapeOptions.color });
 	},
 
-	_clearHideErrorTimeout: function () {
+	_clearHideErrorTimeout() {
 		if (this._hideErrorTimeout) {
 			clearTimeout(this._hideErrorTimeout);
 			this._hideErrorTimeout = null;
@@ -568,25 +570,25 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 	// disable new markers temporarily;
 	// this is to prevent duplicated touch/click events in some browsers
-	_disableNewMarkers: function () {
+	_disableNewMarkers() {
 		this._disableMarkers = true;
 	},
 
 	// see _disableNewMarkers
-	_enableNewMarkers: function () {
-		setTimeout(function () {
+	_enableNewMarkers() {
+		setTimeout(() => {
 			this._disableMarkers = false;
-		}.bind(this), 50);
+		}, 50);
 	},
 
-	_cleanUpShape: function () {
+	_cleanUpShape() {
 		if (this._markers.length > 1) {
-			this._markers[this._markers.length - 1].off('click', this._finishShape, this);
+			this._markers[this._markers.length - 1].off("click", this._finishShape, this);
 		}
 	},
 
-	_fireCreatedEvent: function () {
-		var poly = new this.Poly(this._poly.getLatLngs(), this.options.shapeOptions);
+	_fireCreatedEvent() {
+		let poly = new this.Poly(this._poly.getLatLngs(), this.options.shapeOptions);
 		L.Draw.Feature.prototype._fireCreatedEvent.call(this, poly);
 	}
 });

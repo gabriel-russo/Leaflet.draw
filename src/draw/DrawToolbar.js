@@ -5,7 +5,7 @@
 L.DrawToolbar = L.Toolbar.extend({
 
 	statics: {
-		TYPE: 'draw'
+		TYPE: "draw"
 	},
 
 	options: {
@@ -18,23 +18,23 @@ L.DrawToolbar = L.Toolbar.extend({
 	},
 
 	// @method initialize(): void
-	initialize: function (options) {
+	initialize(options) {
 		// Ensure that the options are merged correctly since L.extend is only shallow
-		for (var type in this.options) {
-			if (this.options.hasOwnProperty(type)) {
+		for (let type in this.options) {
+			if (Object.prototype.hasOwnProperty.call(this.options, type)) {
 				if (options[type]) {
 					options[type] = L.extend({}, this.options[type], options[type]);
 				}
 			}
 		}
 
-		this._toolbarClass = 'leaflet-draw-draw';
+		this._toolbarClass = "leaflet-draw-draw";
 		L.Toolbar.prototype.initialize.call(this, options);
 	},
 
 	// @method getModeHandlers(): object
 	// Get mode handlers information
-	getModeHandlers: function (map) {
+	getModeHandlers(map) {
 		return [
 			{
 				enabled: this.options.polyline,
@@ -71,7 +71,7 @@ L.DrawToolbar = L.Toolbar.extend({
 
 	// @method getActions(): object
 	// Get action information
-	getActions: function (handler) {
+	getActions(handler) {
 		return [
 			{
 				enabled: handler.completeShape,
@@ -98,11 +98,11 @@ L.DrawToolbar = L.Toolbar.extend({
 
 	// @method setOptions(): void
 	// Sets the options to the toolbar
-	setOptions: function (options) {
+	setOptions(options) {
 		L.setOptions(this, options);
 
-		for (var type in this._modes) {
-			if (this._modes.hasOwnProperty(type) && options.hasOwnProperty(type)) {
+		for (let type in this._modes) {
+			if (Object.prototype.hasOwnProperty.call(this._modes, type) && Object.prototype.hasOwnProperty.call(options, type)) {
 				this._modes[type].handler.setOptions(options[type]);
 			}
 		}

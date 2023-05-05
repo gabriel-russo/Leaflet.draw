@@ -5,17 +5,17 @@
  */
 L.Draw.Circle = L.Draw.SimpleShape.extend({
 	statics: {
-		TYPE: 'circle'
+		TYPE: "circle"
 	},
 
 	options: {
 		shapeOptions: {
 			stroke: true,
-			color: '#3388ff',
+			color: "#3388ff",
 			weight: 4,
 			opacity: 0.5,
 			fill: true,
-			fillColor: null, //same as color by default
+			fillColor: null, // same as color by default
 			fillOpacity: 0.2,
 			clickable: true
 		},
@@ -26,7 +26,7 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 	},
 
 	// @method initialize(): void
-	initialize: function (map, options) {
+	initialize(map, options) {
 		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
 		this.type = L.Draw.Circle.TYPE;
 
@@ -35,12 +35,13 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 		L.Draw.SimpleShape.prototype.initialize.call(this, map, options);
 	},
 
-	_drawShape: function (latlng) {
+	_drawShape(latlng) {
 		// Calculate the distance based on the version
+		let distance;
 		if (L.GeometryUtil.isVersion07x()) {
-			var distance = this._startLatLng.distanceTo(latlng);
+			distance = this._startLatLng.distanceTo(latlng);
 		} else {
-			var distance = this._map.distance(this._startLatLng, latlng);
+			distance = this._map.distance(this._startLatLng, latlng);
 		}
 
 		if (!this._shape) {
@@ -51,16 +52,16 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 		}
 	},
 
-	_fireCreatedEvent: function () {
-		var circle = new L.Circle(this._startLatLng, this._shape.getRadius(), this.options.shapeOptions);
+	_fireCreatedEvent() {
+		let circle = new L.Circle(this._startLatLng, this._shape.getRadius(), this.options.shapeOptions);
 		L.Draw.SimpleShape.prototype._fireCreatedEvent.call(this, circle);
 	},
 
-	_onMouseMove: function (e) {
-		var latlng = e.latlng,
-			showRadius = this.options.showRadius,
-			useMetric = this.options.metric,
-			radius;
+	_onMouseMove(e) {
+		let { latlng } = e;
+		let { showRadius } = this.options;
+		let useMetric = this.options.metric;
+		let radius;
 
 		this._tooltip.updatePosition(latlng);
 		if (this._isDrawing) {
@@ -69,14 +70,14 @@ L.Draw.Circle = L.Draw.SimpleShape.extend({
 			// Get the new radius (rounded to 1 dp)
 			radius = this._shape.getRadius().toFixed(1);
 
-			var subtext = '';
+			let subtext = "";
 			if (showRadius) {
-				subtext = L.drawLocal.draw.handlers.circle.radius + ': ' +
-					L.GeometryUtil.readableDistance(radius, useMetric, this.options.feet, this.options.nautic);
+				subtext = `${L.drawLocal.draw.handlers.circle.radius}: ${
+					L.GeometryUtil.readableDistance(radius, useMetric, this.options.feet, this.options.nautic)}`;
 			}
 			this._tooltip.updateContent({
 				text: this._endLabelText,
-				subtext: subtext
+				subtext
 			});
 		}
 	}

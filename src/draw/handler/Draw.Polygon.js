@@ -5,7 +5,7 @@
  */
 L.Draw.Polygon = L.Draw.Polyline.extend({
 	statics: {
-		TYPE: 'polygon'
+		TYPE: "polygon"
 	},
 
 	Poly: L.Polygon,
@@ -15,11 +15,11 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 		showLength: false,
 		shapeOptions: {
 			stroke: true,
-			color: '#3388ff',
+			color: "#3388ff",
 			weight: 4,
 			opacity: 0.5,
 			fill: true,
-			fillColor: null, //same as color by default
+			fillColor: null, // same as color by default
 			fillOpacity: 0.2,
 			clickable: true
 		},
@@ -34,33 +34,34 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 	},
 
 	// @method initialize(): void
-	initialize: function (map, options) {
+	initialize(map, options) {
 		L.Draw.Polyline.prototype.initialize.call(this, map, options);
 
 		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
 		this.type = L.Draw.Polygon.TYPE;
 	},
 
-	_updateFinishHandler: function () {
-		var markerCount = this._markers.length;
+	_updateFinishHandler() {
+		let markerCount = this._markers.length;
 
 		// The first marker should have a click handler to close the polygon
 		if (markerCount === 1) {
-			this._markers[0].on('click', this._finishShape, this);
+			this._markers[0].on("click", this._finishShape, this);
 		}
 
 		// Add and update the double click handler
 		if (markerCount > 2) {
-			this._markers[markerCount - 1].on('dblclick', this._finishShape, this);
+			this._markers[markerCount - 1].on("dblclick", this._finishShape, this);
 			// Only need to remove handler if has been added before
 			if (markerCount > 3) {
-				this._markers[markerCount - 2].off('dblclick', this._finishShape, this);
+				this._markers[markerCount - 2].off("dblclick", this._finishShape, this);
 			}
 		}
 	},
 
-	_getTooltipText: function () {
-		var text, subtext;
+	_getTooltipText() {
+		let text;
+		let subtext;
 
 		if (this._markers.length === 0) {
 			text = L.drawLocal.draw.handlers.polygon.tooltip.start;
@@ -73,14 +74,14 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 		}
 
 		return {
-			text: text,
-			subtext: subtext
+			text,
+			subtext
 		};
 	},
 
-	_getMeasurementString: function () {
-		var area = this._area,
-			measurementString = '';
+	_getMeasurementString() {
+		let area = this._area;
+		let measurementString = "";
 
 
 		if (!area && !this.options.showLength) {
@@ -92,18 +93,18 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 		}
 
 		if (area) {
-			measurementString += '<br>' + L.GeometryUtil.readableArea(area, this.options.metric, this.options.precision);
+			measurementString += `<br>${L.GeometryUtil.readableArea(area, this.options.metric, this.options.precision)}`;
 		}
 
 		return measurementString;
 	},
 
-	_shapeIsValid: function () {
+	_shapeIsValid() {
 		return this._markers.length >= 3;
 	},
 
-	_vertexChanged: function (latlng, added) {
-		var latLngs;
+	_vertexChanged(latlng, added) {
+		let latLngs;
 
 		// Check to see if we should show the area
 		if (!this.options.allowIntersection && this.options.showArea) {
@@ -115,14 +116,14 @@ L.Draw.Polygon = L.Draw.Polyline.extend({
 		L.Draw.Polyline.prototype._vertexChanged.call(this, latlng, added);
 	},
 
-	_cleanUpShape: function () {
-		var markerCount = this._markers.length;
+	_cleanUpShape() {
+		let markerCount = this._markers.length;
 
 		if (markerCount > 0) {
-			this._markers[0].off('click', this._finishShape, this);
+			this._markers[0].off("click", this._finishShape, this);
 
 			if (markerCount > 2) {
-				this._markers[markerCount - 1].off('dblclick', this._finishShape, this);
+				this._markers[markerCount - 1].off("dblclick", this._finishShape, this);
 			}
 		}
 	}
