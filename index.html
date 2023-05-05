@@ -1,10 +1,43 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Leaflet Draw Documentation</title>
-    <script>
-        location = "http://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html";
-    </script>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- LEAFLET SOURCE    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.js"
+            integrity="sha512-Dqm3h1Y4qiHUjbhxTuBGQsza0Tfppn53SHlu/uj1f+RT+xfShfe7r6czRf5r2NmllO2aKx+tYJgoxboOkn1Scg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.css"
+          integrity="sha512-mD70nAW2ThLsWH0zif8JPbfraZ8hbCtjQ+5RU1m4+ztZq6/MymyZeB55pWsi4YAX+73yvcaJyk61mzfYMvtm9w=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+    <!-- Your Leaflet Draw build -->
+    <script type="text/javascript" src="./dist/leaflet.draw-src.js"></script>
+    <link rel="stylesheet" href="./dist/leaflet.draw-src.css">
 </head>
-<body>
+
+<body style="display: flex; justify-content: center">
+<div id="map" style="width: 95vw; height: 95vh"></div>
 </body>
+
+<script type="text/javascript">
+    let map = L.map('map', {drawControl: true}).setView([51.505, -0.09], 13);
+
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    let drawnItems = new L.FeatureGroup();
+
+    map.addLayer(drawnItems);
+
+    let drawControl = new L.Control.Draw({
+        edit: {
+            featureGroup: drawnItems
+        }
+    });
+
+    map.addControl(drawControl);
+</script>
+
 </html>
