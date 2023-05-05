@@ -11,7 +11,6 @@
     "jake": ">=8.0.15",
     "leafdoc": ">=1.4.0",
     "leaflet": ">=1.0.1",
-    "prettier": ">=2.8.8",
     "source-map": ">=0.7.4",
     "uglify-js": ">=2.8.29",
     "uglifycss": ">=0.0.25"
