@@ -18,8 +18,8 @@ Please check out our [Api Documentation](https://leaflet.github.io/Leaflet.draw/
 
 - [Customizing Language](#customizing-language-and-text-in-leafletdraw)
 - [Common tasks](#common-tasks)
-- [Contributing](#contributing)
-- [Thanks](#thanks)
+- [Building the project](#build)
+- [Documentation](#documentation)
 
 ## Customizing language and text in Leaflet.draw
 
@@ -133,9 +133,7 @@ drawControl.setDrawingOptions({
 });
 ```
 
-# Contributing
- 
-## Building
+# Build
 
 To build you can install the npm dependencies:
 
