@@ -6,24 +6,24 @@ L.Edit = L.Edit || {};
  */
 L.Edit.Circle = L.Edit.CircleMarker.extend({
 
-	_createResizeMarker: function () {
-		var center = this._shape.getLatLng(),
-			resizemarkerPoint = this._getResizeMarkerPoint(center);
+	_createResizeMarker() {
+		let center = this._shape.getLatLng();
+		let resizemarkerPoint = this._getResizeMarkerPoint(center);
 
 		this._resizeMarkers = [];
 		this._resizeMarkers.push(this._createMarker(resizemarkerPoint, this.options.resizeIcon));
 	},
 
-	_getResizeMarkerPoint: function (latlng) {
+	_getResizeMarkerPoint(latlng) {
 		// From L.shape.getBounds()
-		var delta = this._shape._radius * Math.cos(Math.PI / 4),
-			point = this._map.project(latlng);
+		let delta = this._shape._radius * Math.cos(Math.PI / 4);
+		let point = this._map.project(latlng);
 		return this._map.unproject([point.x + delta, point.y - delta]);
 	},
 
-	_resize: function (latlng) {
-		var moveLatLng = this._moveMarker.getLatLng();
-
+	_resize(latlng) {
+		let moveLatLng = this._moveMarker.getLatLng();
+		let radius;
 		// Calculate the radius based on the version
 		if (L.GeometryUtil.isVersion07x()) {
 			radius = moveLatLng.distanceTo(latlng);
@@ -34,19 +34,19 @@ L.Edit.Circle = L.Edit.CircleMarker.extend({
 
 		if (this._map.editTooltip) {
 			this._map._editTooltip.updateContent({
-				text: L.drawLocal.edit.handlers.edit.tooltip.subtext + '<br />' + L.drawLocal.edit.handlers.edit.tooltip.text,
-				subtext: L.drawLocal.draw.handlers.circle.radius + ': ' +
-				L.GeometryUtil.readableDistance(radius, true, this.options.feet, this.options.nautic)
+				text: `${L.drawLocal.edit.handlers.edit.tooltip.subtext}<br />${L.drawLocal.edit.handlers.edit.tooltip.text}`,
+				subtext: `${L.drawLocal.draw.handlers.circle.radius}: ${
+					L.GeometryUtil.readableDistance(radius, true, this.options.feet, this.options.nautic)}`
 			});
 		}
 
 		this._shape.setRadius(radius);
 
-		this._map.fire(L.Draw.Event.EDITRESIZE, {layer: this._shape});
+		this._map.fire(L.Draw.Event.EDITRESIZE, { layer: this._shape });
 	}
 });
 
-L.Circle.addInitHook(function () {
+function addEditFunctionalityToDrawnCircle() {
 	if (L.Edit.Circle) {
 		this.editing = new L.Edit.Circle(this);
 
@@ -54,4 +54,6 @@ L.Circle.addInitHook(function () {
 			this.editing.enable();
 		}
 	}
-});
+}
+
+L.Circle.addInitHook(addEditFunctionalityToDrawnCircle);

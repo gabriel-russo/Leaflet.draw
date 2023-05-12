@@ -5,20 +5,20 @@ L.Edit = L.Edit || {};
  * @inherits L.Edit.SimpleShape
  */
 L.Edit.CircleMarker = L.Edit.SimpleShape.extend({
-	_createMoveMarker: function () {
-		var center = this._shape.getLatLng();
+	_createMoveMarker() {
+		let center = this._shape.getLatLng();
 
 		this._moveMarker = this._createMarker(center, this.options.moveIcon);
 	},
 
-	_createResizeMarker: function () {
+	_createResizeMarker() {
 		// To avoid an undefined check in L.Edit.SimpleShape.removeHooks
 		this._resizeMarkers = [];
 	},
 
-	_move: function (latlng) {
+	_move(latlng) {
 		if (this._resizeMarkers.length) {
-			var resizemarkerPoint = this._getResizeMarkerPoint(latlng);
+			let resizemarkerPoint = this._getResizeMarkerPoint(latlng);
 			// Move the resize marker
 			this._resizeMarkers[0].setLatLng(resizemarkerPoint);
 		}
@@ -26,11 +26,11 @@ L.Edit.CircleMarker = L.Edit.SimpleShape.extend({
 		// Move the circle
 		this._shape.setLatLng(latlng);
 
-		this._map.fire(L.Draw.Event.EDITMOVE, {layer: this._shape});
-	},
+		this._map.fire(L.Draw.Event.EDITMOVE, { layer: this._shape });
+	}
 });
 
-L.CircleMarker.addInitHook(function () {
+function addEditFunctionalityToDrawnCircleMarker() {
 	if (L.Edit.CircleMarker) {
 		this.editing = new L.Edit.CircleMarker(this);
 
@@ -39,15 +39,17 @@ L.CircleMarker.addInitHook(function () {
 		}
 	}
 
-	this.on('add', function () {
+	this.addEventListener("add", () => {
 		if (this.editing && this.editing.enabled()) {
 			this.editing.addHooks();
 		}
 	});
 
-	this.on('remove', function () {
+	this.addEventListener("remove", () => {
 		if (this.editing && this.editing.enabled()) {
 			this.editing.removeHooks();
 		}
 	});
-});
+}
+
+L.CircleMarker.addInitHook(addEditFunctionalityToDrawnCircleMarker);

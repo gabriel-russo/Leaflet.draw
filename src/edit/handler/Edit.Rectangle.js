@@ -5,41 +5,42 @@ L.Edit = L.Edit || {};
  * @inherits L.Edit.SimpleShape
  */
 L.Edit.Rectangle = L.Edit.SimpleShape.extend({
-	_createMoveMarker: function () {
-		var bounds = this._shape.getBounds(),
-			center = bounds.getCenter();
+	_createMoveMarker() {
+		let bounds = this._shape.getBounds();
+		let center = bounds.getCenter();
 
 		this._moveMarker = this._createMarker(center, this.options.moveIcon);
 	},
 
-	_createResizeMarker: function () {
-		var corners = this._getCorners();
+	_createResizeMarker() {
+		let corners = this._getCorners();
 
 		this._resizeMarkers = [];
 
-		for (var i = 0, l = corners.length; i < l; i++) {
+		for (let i = 0, l = corners.length; i < l; i++) {
 			this._resizeMarkers.push(this._createMarker(corners[i], this.options.resizeIcon));
 			// Monkey in the corner index as we will need to know this for dragging
 			this._resizeMarkers[i]._cornerIndex = i;
 		}
 	},
 
-	_onMarkerDragStart: function (e) {
+	_onMarkerDragStart(e) {
 		L.Edit.SimpleShape.prototype._onMarkerDragStart.call(this, e);
 
 		// Save a reference to the opposite point
-		var corners = this._getCorners(),
-			marker = e.target,
-			currentCornerIndex = marker._cornerIndex;
+		let corners = this._getCorners();
+		let marker = e.target;
+		let currentCornerIndex = marker._cornerIndex;
 
 		this._oppositeCorner = corners[(currentCornerIndex + 2) % 4];
 
 		this._toggleCornerMarkers(0, currentCornerIndex);
 	},
 
-	_onMarkerDragEnd: function (e) {
-		var marker = e.target,
-			bounds, center;
+	_onMarkerDragEnd(e) {
+		let marker = e.target;
+		let bounds;
+		let center;
 
 		// Reset move marker position to the center
 		if (marker === this._moveMarker) {
@@ -56,14 +57,15 @@ L.Edit.Rectangle = L.Edit.SimpleShape.extend({
 		L.Edit.SimpleShape.prototype._onMarkerDragEnd.call(this, e);
 	},
 
-	_move: function (newCenter) {
-		var latlngs = this._shape._defaultShape ? this._shape._defaultShape() : this._shape.getLatLngs(),
-			bounds = this._shape.getBounds(),
-			center = bounds.getCenter(),
-			offset, newLatLngs = [];
+	_move(newCenter) {
+		let latlngs = this._shape._defaultShape ? this._shape._defaultShape() : this._shape.getLatLngs();
+		let bounds = this._shape.getBounds();
+		let center = bounds.getCenter();
+		let offset;
+		let newLatLngs = [];
 
 		// Offset the latlngs to the new center
-		for (var i = 0, l = latlngs.length; i < l; i++) {
+		for (let i = 0, l = latlngs.length; i < l; i++) {
 			offset = [latlngs[i].lat - center.lat, latlngs[i].lng - center.lng];
 			newLatLngs.push([newCenter.lat + offset[0], newCenter.lng + offset[1]]);
 		}
@@ -73,11 +75,11 @@ L.Edit.Rectangle = L.Edit.SimpleShape.extend({
 		// Reposition the resize markers
 		this._repositionCornerMarkers();
 
-		this._map.fire(L.Draw.Event.EDITMOVE, {layer: this._shape});
+		this._map.fire(L.Draw.Event.EDITMOVE, { layer: this._shape });
 	},
 
-	_resize: function (latlng) {
-		var bounds;
+	_resize(latlng) {
+		let bounds;
 
 		// Update the shape based on the current position of this corner and the opposite point
 		this._shape.setBounds(L.latLngBounds(latlng, this._oppositeCorner));
@@ -86,40 +88,48 @@ L.Edit.Rectangle = L.Edit.SimpleShape.extend({
 		bounds = this._shape.getBounds();
 		this._moveMarker.setLatLng(bounds.getCenter());
 
-		this._map.fire(L.Draw.Event.EDITRESIZE, {layer: this._shape});
+		this._map.fire(L.Draw.Event.EDITRESIZE, { layer: this._shape });
 	},
 
-	_getCorners: function () {
-		var bounds = this._shape.getBounds(),
-			nw = bounds.getNorthWest(),
-			ne = bounds.getNorthEast(),
-			se = bounds.getSouthEast(),
-			sw = bounds.getSouthWest();
+	_getCorners() {
+		let bounds = this._shape.getBounds();
+		let nw = bounds.getNorthWest();
+		let ne = bounds.getNorthEast();
+		let se = bounds.getSouthEast();
+		let sw = bounds.getSouthWest();
 
 		return [nw, ne, se, sw];
 	},
 
-	_toggleCornerMarkers: function (opacity) {
-		for (var i = 0, l = this._resizeMarkers.length; i < l; i++) {
+	_toggleCornerMarkers(opacity) {
+		for (let i = 0, l = this._resizeMarkers.length; i < l; i++) {
 			this._resizeMarkers[i].setOpacity(opacity);
 		}
 	},
 
-	_repositionCornerMarkers: function () {
-		var corners = this._getCorners();
+	_repositionCornerMarkers() {
+		let corners = this._getCorners();
 
-		for (var i = 0, l = this._resizeMarkers.length; i < l; i++) {
+		for (let i = 0, l = this._resizeMarkers.length; i < l; i++) {
 			this._resizeMarkers[i].setLatLng(corners[i]);
 		}
 	}
 });
 
-L.Rectangle.addInitHook(function () {
+function addEditFunctionalityToDrawnRectangle() {
+
+	if (this.editing) {
+		return;
+	}
+
 	if (L.Edit.Rectangle) {
+
 		this.editing = new L.Edit.Rectangle(this);
 
 		if (this.options.editable) {
 			this.editing.enable();
 		}
 	}
-});
+}
+
+L.Rectangle.addInitHook(addEditFunctionalityToDrawnRectangle);
