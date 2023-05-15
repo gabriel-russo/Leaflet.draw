@@ -26,7 +26,7 @@
 		attribution: "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"
 	});
 
-	let map = new L.Map("map", { layers: [osm], center: new L.LatLng(-37.7772, 175.2756), zoom: 15 });
+	let map = new L.Map("map", { layers: [osm], center: new L.LatLng(-37.7772, 175.2756), zoom: 15, renderer: L.canvas() });
 
 	let editableLayers = new L.FeatureGroup();
 	map.addLayer(editableLayers);
@@ -43,18 +43,18 @@
 			polygon: {
 				allowIntersection: false, // Restricts shapes to simple polygons
 				drawError: {
-					color: "#e1e100", // Color the shape will turn when intersects
+					color: "#ff0000", // Color the shape will turn when intersects
 					message: "<strong>Oh snap!<strong> you can't draw that!" // Message that will show when intersect
 				},
 				shapeOptions: {
-					color: "#bada55"
+					color: "#0000ff"
 				}
 			},
 			circle: false, // Turns off this drawing tool
 			rectangle: {
 				shapeOptions: {
 					clickable: false,
-          editable: true,
+          editable: false,
 				}
 			}
 		},
