@@ -135,9 +135,9 @@ drawControl.setDrawingOptions({
 
 # Contributing
  
-## Building
+## Building and editing
 
-To build you can install the npm dependencies:
+First, install npm dependencies:
 
     npm install
 
@@ -146,6 +146,10 @@ and then use:
     npm run build
 
 after that, you can get the code in `dist/` folder.
+
+or
+
+edit the code, repeat the previous steps and visualize in `index.html`.
 
 ## Documentation
 
