@@ -42,6 +42,7 @@ L.Control.Draw = L.Control.extend({
 			// Listen for when toolbar is enabled
 			this._toolbars[L.EditToolbar.TYPE].on("enable", this._toolbarEnabled, this);
 		}
+
 		L.toolbar = this; // set global var for editing the toolbar
 	},
 

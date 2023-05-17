@@ -89,8 +89,25 @@ L.Toolbar = L.Class.extend({
 		let modeHandlers = this.getModeHandlers(map);
 		let i;
 
-		this._toolbarContainer = L.DomUtil.create("div", "leaflet-draw-toolbar leaflet-bar");
 		this._map = map;
+
+		// If customButtons option is set, add the buttons to the toolbar and
+		// exit the function because toolbar dom is not needed
+		if (this.options.customButtons) {
+			for (i = 0; i < modeHandlers.length; i++) {
+				if (modeHandlers[i].enabled) {
+					this._initModeHandlerOnExternalButton(
+						modeHandlers[i].handler,
+						modeHandlers[i].title,
+						this.options.customButtons[modeHandlers[i].handler.type]
+					);
+				}
+			}
+
+			return;
+		}
+
+		this._toolbarContainer = L.DomUtil.create("div", "leaflet-draw-toolbar leaflet-bar");
 
 		for (i = 0; i < modeHandlers.length; i++) {
 			if (modeHandlers[i].enabled) {
@@ -152,6 +169,32 @@ L.Toolbar = L.Class.extend({
 		}
 		this._actionButtons = [];
 		this._actionsContainer = null;
+	},
+
+	_initModeHandlerOnExternalButton(handler, title, button) {
+		let { type } = handler;
+
+		this._modes[type] = {};
+
+		this._modes[type].handler = handler;
+
+		this._modes[type].button = button;
+
+		this._modes[type].button.title = title;
+
+		/* iOS does not use click events */
+		let eventType = this._detectIOS() ? "touchstart" : "click";
+
+		L.DomEvent.on(button, "click", L.DomEvent.stopPropagation)
+			.on(button, "mousedown", L.DomEvent.stopPropagation)
+			.on(button, "dblclick", L.DomEvent.stopPropagation)
+			.on(button, "touchstart", L.DomEvent.stopPropagation)
+			.on(button, "click", L.DomEvent.preventDefault)
+			.on(button, eventType, handler.enable, handler);
+
+		this._modes[type].handler
+			.on("enabled", this._handlerActivated, this)
+			.on("disabled", this._handlerDeactivated, this);
 	},
 
 	_initModeHandler(handler, container, buttonIndex, classNamePredix, buttonTitle) {

@@ -81,6 +81,14 @@ L.drawLocal = {
 	// 	}
 	// },
 	draw: {
+		customButtons: {
+			polyline: null,
+			polygon: null,
+			rectangle: null,
+			circle: null,
+			marker: null,
+			circlemarker: null,
+		},
 		toolbar: {
 			// #TODO: this should be reorganized where actions are nested in actions
 			// ex: actions.undo  or actions.cancel
