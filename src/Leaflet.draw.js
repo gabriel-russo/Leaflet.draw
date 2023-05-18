@@ -87,7 +87,7 @@ L.drawLocal = {
 			rectangle: null,
 			circle: null,
 			marker: null,
-			circlemarker: null,
+			circlemarker: null
 		},
 		toolbar: {
 			// #TODO: this should be reorganized where actions are nested in actions
@@ -158,6 +158,10 @@ L.drawLocal = {
 		}
 	},
 	edit: {
+		customButtons: {
+			edit: null,
+			remove: null
+		},
 		toolbar: {
 			actions: {
 				save: {

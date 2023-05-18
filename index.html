@@ -17,14 +17,24 @@
 </head>
 
 <body style="display: flex; justify-content: center; flex-direction: column; align-items: center;gap: 5px">
-<div id="map" style="width: 95vw; height: 95vh"></div>
-<div style="display: flex; gap: 35px">
+<div id="map" style="width: 95vw; height: 80vh"></div>
+<div style="display: flex; gap: 35px; border: 1px solid black; padding: 5px">
   <button type="button" id="btn-polyline">PolyLine</button>
   <button type="button" id="btn-polygon">Polygon</button>
   <button type="button" id="btn-rectangle">Rectangle</button>
   <button type="button" id="btn-marker">Marker</button>
   <button type="button" id="btn-circlemarker">CircleMarker</button>
 </div>
+<div style="border: 1px solid black;padding: 5px">
+  <button type="button" id="btn-edit">Edit mode</button>
+  <button type="button" id="btn-remove">Delete mode</button>
+</div>
+<div style="border: 1px solid black;padding: 5px">
+  <button type="button" id="btn-save" disabled>Save</button>
+  <button type="button" id="btn-cancel" disabled>Cancel</button>
+  <button type="button" id="btn-undo" disabled>Undo</button>
+</div>
+
 </body>
 
 <script type="text/javascript">
@@ -78,6 +88,10 @@
 			}
 		},
 		edit: {
+			customButtons: {
+				edit: document.getElementById("btn-edit"),
+				remove: document.getElementById("btn-remove")
+			},
 			featureGroup: editableLayers, //REQUIRED!!
 			remove: true
 		}
@@ -96,6 +110,35 @@
 		}
 
 		editableLayers.addLayer(layer);
+	});
+
+</script>
+
+<script type="text/javascript">
+
+	const actions_btn = {
+		_save: document.getElementById("btn-save"),
+		disable: document.getElementById("btn-cancel"),
+		undo: document.getElementById("btn-undo")
+	};
+
+	map.addEventListener("draw:actionstart", (e) => {
+		console.log(e);
+		e.actions.map(ev => {
+			if (ev.callback) {
+				actions_btn[ev.callback.name].addEventListener("click", ev.callback.bind(ev.context));
+				actions_btn[ev.callback.name].disabled = false;
+			}
+		});
+
+	});
+
+	map.addEventListener("draw:actionstop", (e) => {
+		console.log(e);
+		Object.keys(actions_btn).map(btn => {
+      actions_btn[btn].disabled = true;
+    });
+
 	});
 
 </script>

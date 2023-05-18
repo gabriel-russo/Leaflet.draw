@@ -175,3 +175,17 @@ L.Draw.Event.TOOLBARCLOSED = "draw:toolbarclosed";
  * Triggered when a marker is right clicked.
  */
 L.Draw.Event.MARKERCONTEXT = "draw:markercontext";
+
+/**
+ * @event draw:actionstart: String
+ *
+ * Triggered when action is binded to a button.
+ */
+L.Draw.Event.ACTIONSTART = "draw:actionstart";
+
+/**
+ * @event draw:actionstop: String
+ *
+ * Triggered when action is unbinded from a button.
+ */
+L.Draw.Event.ACTIONSTOP = "draw:actionstop";
