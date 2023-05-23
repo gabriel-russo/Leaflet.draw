@@ -124,8 +124,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 
 		// remove markers from map
 		this._map.removeLayer(this._markerGroup);
-		delete this._markerGroup;
-		delete this._markers;
+		this._markerGroup = [];
+		this._markers = [];
 
 		this._map.removeLayer(this._poly);
 		delete this._poly;

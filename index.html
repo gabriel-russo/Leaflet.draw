@@ -137,15 +137,19 @@
 	};
 
 	map.addEventListener("draw:actionstart", (e) => {
+
 		for (let action in e.actions) {
 			actions_btn[action].disabled = !e.actions[action];
 		}
+
 	});
 
-	map.addEventListener("draw:actionstop", () => {
+	map.addEventListener("draw:actionstop", (e) => {
+
 		for (let btn in actions_btn) {
 			actions_btn[btn].disabled = true;
 		}
+
 	});
 
 </script>
