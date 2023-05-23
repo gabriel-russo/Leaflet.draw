@@ -83,30 +83,49 @@ L.Toolbar = L.Class.extend({
 	// @method addToolbar(map): L.DomUtil
 	// Adds the toolbar to the map and returns the toolbar dom element
 	addToolbar(map) {
-		let container = L.DomUtil.create("div", "leaflet-draw-section");
-		let buttonIndex = 0;
-		let buttonClassPrefix = this._toolbarClass || "";
 		let modeHandlers = this.getModeHandlers(map);
 		let i;
 
 		this._map = map;
 
-		// If customButtons option is set, add the buttons to the toolbar and
-		// exit the function because toolbar dom is not needed
-		if (this.options.customButtons) {
+		/*
+			If externalButtons is set, then just save it in this._modes and set a
+			callback in it's listener. -> Use _initModeHandlerOnExternalButton
+
+			If it's not set, then we need to create the DOM elements for the toolbar.
+			-> Use _initModeHandler
+		*/
+		if (this.options.externalButtons) {
 			for (i = 0; i < modeHandlers.length; i++) {
 				if (modeHandlers[i].enabled) {
 					this._initModeHandlerOnExternalButton(
 						modeHandlers[i].handler,
 						modeHandlers[i].title,
-						this.options.customButtons[modeHandlers[i].handler.type]
+						this.options.externalButtons[modeHandlers[i].handler.type]
 					);
 				}
+			}
+
+			/*
+			Save external action buttons in _actionButtons to track them and
+			set a callback depending of it's handler type.
+
+			Example: if it's a polyline, we need cancel, undo and save actions.
+
+			After finish drawing, we dispose the button bindings.
+
+			*/
+
+			if (!this._actionButtons.length) {
+				this._actionButtons = this.options.externalButtons.actions;
 			}
 
 			return;
 		}
 
+		let container = L.DomUtil.create("div", "leaflet-draw-section");
+		let buttonIndex = 0;
+		let buttonClassPrefix = this._toolbarClass || "";
 		this._toolbarContainer = L.DomUtil.create("div", "leaflet-draw-toolbar leaflet-bar");
 
 		for (i = 0; i < modeHandlers.length; i++) {
@@ -226,6 +245,30 @@ L.Toolbar = L.Class.extend({
 		return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	},
 
+	_bindButton(button, callback, context) {
+		/* iOS does not use click events */
+		let buttonEvent = this._detectIOS() ? "touchstart" : "click";
+
+		L.DomEvent.on(button, "click", L.DomEvent.stopPropagation)
+			.on(button, "mousedown", L.DomEvent.stopPropagation)
+			.on(button, "dblclick", L.DomEvent.stopPropagation)
+			.on(button, "touchstart", L.DomEvent.stopPropagation)
+			.on(button, "click", L.DomEvent.preventDefault)
+			.on(button, buttonEvent, callback, context);
+	},
+
+	_disposeButton(button, callback) {
+		/* iOS does not use click events */
+		let buttonEvent = this._detectIOS() ? "touchstart" : "click";
+
+		L.DomEvent.off(button, "click", L.DomEvent.stopPropagation)
+			.off(button, "mousedown", L.DomEvent.stopPropagation)
+			.off(button, "dblclick", L.DomEvent.stopPropagation)
+			.off(button, "touchstart", L.DomEvent.stopPropagation)
+			.off(button, "click", L.DomEvent.preventDefault)
+			.off(button, buttonEvent, callback);
+	},
+
 	_createButton(options) {
 		let link = L.DomUtil.create("a", options.className || "", options.container);
 		// Screen reader tag
@@ -244,29 +287,9 @@ L.Toolbar = L.Class.extend({
 			sr.innerHTML = options.text;
 		}
 
-		/* iOS does not use click events */
-		let buttonEvent = this._detectIOS() ? "touchstart" : "click";
-
-		L.DomEvent.on(link, "click", L.DomEvent.stopPropagation)
-			.on(link, "mousedown", L.DomEvent.stopPropagation)
-			.on(link, "dblclick", L.DomEvent.stopPropagation)
-			.on(link, "touchstart", L.DomEvent.stopPropagation)
-			.on(link, "click", L.DomEvent.preventDefault)
-			.on(link, buttonEvent, options.callback, options.context);
+		this._bindButton(link, options.callback, options.context);
 
 		return link;
-	},
-
-	_disposeButton(button, callback) {
-		/* iOS does not use click events */
-		let buttonEvent = this._detectIOS() ? "touchstart" : "click";
-
-		L.DomEvent.off(button, "click", L.DomEvent.stopPropagation)
-			.off(button, "mousedown", L.DomEvent.stopPropagation)
-			.off(button, "dblclick", L.DomEvent.stopPropagation)
-			.off(button, "touchstart", L.DomEvent.stopPropagation)
-			.off(button, "click", L.DomEvent.preventDefault)
-			.off(button, buttonEvent, callback);
 	},
 
 	_handlerActivated(e) {
@@ -276,22 +299,65 @@ L.Toolbar = L.Class.extend({
 		// Cache new active feature
 		this._activeMode = this._modes[e.handler];
 
-		L.DomUtil.addClass(this._activeMode.button, "leaflet-draw-toolbar-button-enabled");
+		// Cache new active actions
+		this._activeMode.actions = this.getActions(this._activeMode.handler);
 
-		// 	this._showActionsToolbar() :
-		this._map.fire(L.Draw.Event.ACTIONSTART, { actions: this.getActions(e.handler) });
-		this.fire("enable");
+		if (this.options.externalButtons) {
+
+			// This will be returned to user, making track of the actions
+			let activatedActions = {
+				finish: false,
+				cancel: false,
+				undo: false,
+				save: false,
+				clearAll: false
+			};
+
+			// Bind the external buttons to actions
+			this._activeMode.actions.forEach(action => {
+
+				if (action.enabled) {
+
+					this._bindButton(this._actionButtons[action.type], action.callback, action.context);
+					activatedActions[action.type] = true;
+				}
+
+			});
+
+			this._map.fire(L.Draw.Event.ACTIONSTART, { actions: activatedActions });
+
+		} else {
+
+			L.DomUtil.addClass(this._activeMode.button, "leaflet-draw-toolbar-button-enabled");
+			this._showActionsToolbar();
+			this.fire("enable");
+
+		}
+
 	},
 
 	_handlerDeactivated() {
-		// this._hideActionsToolbar();
+		if (this.options.externalButtons) {
 
-		L.DomUtil.removeClass(this._activeMode.button, "leaflet-draw-toolbar-button-enabled");
+			this._activeMode.actions.forEach(action => {
+
+				if (action.enabled) {
+					this._disposeButton(this._actionButtons[action.type], action.callback);
+				}
+
+			});
+
+			this._map.fire(L.Draw.Event.ACTIONSTOP);
+
+		} else {
+
+			this._hideActionsToolbar();
+			L.DomUtil.removeClass(this._activeMode.button, "leaflet-draw-toolbar-button-enabled");
+			this.fire("disable");
+		}
 
 		this._activeMode = null;
 
-		this._map.fire(L.Draw.Event.ACTIONSTOP);
-		this.fire("disable");
 	},
 
 	_createActions(handler) {

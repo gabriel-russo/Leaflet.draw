@@ -81,13 +81,18 @@ L.drawLocal = {
 	// 	}
 	// },
 	draw: {
-		customButtons: {
+		externalButtons: {
 			polyline: null,
 			polygon: null,
 			rectangle: null,
 			circle: null,
 			marker: null,
-			circlemarker: null
+			circlemarker: null,
+			actions: {
+				finish: null,
+				cancel: null,
+				undo: null
+			}
 		},
 		toolbar: {
 			// #TODO: this should be reorganized where actions are nested in actions
@@ -158,9 +163,14 @@ L.drawLocal = {
 		}
 	},
 	edit: {
-		customButtons: {
+		externalButtons: {
 			edit: null,
-			remove: null
+			remove: null,
+			actions: {
+				save: null,
+				cancel: null,
+				clearAll: null
+			}
 		},
 		toolbar: {
 			actions: {

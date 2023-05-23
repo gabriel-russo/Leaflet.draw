@@ -83,12 +83,16 @@ L.EditToolbar = L.Toolbar.extend({
 	getActions(handler) {
 		let actions = [
 			{
+				type: "save",
+				enabled: this._save,
 				title: L.drawLocal.edit.toolbar.actions.save.title,
 				text: L.drawLocal.edit.toolbar.actions.save.text,
 				callback: this._save,
 				context: this
 			},
 			{
+				type: "cancel",
+				enabled: this.disable,
 				title: L.drawLocal.edit.toolbar.actions.cancel.title,
 				text: L.drawLocal.edit.toolbar.actions.cancel.text,
 				callback: this.disable,
@@ -98,6 +102,8 @@ L.EditToolbar = L.Toolbar.extend({
 
 		if (handler.removeAllLayers) {
 			actions.push({
+				type: "clearAll",
+				enabled: this._clearAllLayers,
 				title: L.drawLocal.edit.toolbar.actions.clearAll.title,
 				text: L.drawLocal.edit.toolbar.actions.clearAll.text,
 				callback: this._clearAllLayers,
@@ -141,6 +147,7 @@ L.EditToolbar = L.Toolbar.extend({
 	},
 
 	_save() {
+		console.log("_save: ", this);
 		this._activeMode.handler.save();
 		if (this._activeMode) {
 			this._activeMode.handler.disable();

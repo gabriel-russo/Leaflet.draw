@@ -276,8 +276,7 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			this._clickHandled = true;
 			this._disableNewMarkers();
 			let { originalEvent } = e;
-			let { clientX } = originalEvent;
-			let { clientY } = originalEvent;
+			let { clientX, clientY } = originalEvent;
 			this._startPoint.call(this, clientX, clientY);
 		}
 	},

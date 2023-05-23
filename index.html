@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <title>Title</title>
   <!-- LEAFLET SOURCE    -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.js"
-          integrity="sha512-Dqm3h1Y4qiHUjbhxTuBGQsza0Tfppn53SHlu/uj1f+RT+xfShfe7r6czRf5r2NmllO2aKx+tYJgoxboOkn1Scg=="
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
+          integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
           crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.3/leaflet.css"
-        integrity="sha512-mD70nAW2ThLsWH0zif8JPbfraZ8hbCtjQ+5RU1m4+ztZq6/MymyZeB55pWsi4YAX+73yvcaJyk61mzfYMvtm9w=="
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+        integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- Your Leaflet Draw build -->
@@ -32,7 +32,9 @@
 <div style="border: 1px solid black;padding: 5px">
   <button type="button" id="btn-save" disabled>Save</button>
   <button type="button" id="btn-cancel" disabled>Cancel</button>
-  <button type="button" id="btn-undo" disabled>Undo</button>
+  <button type="button" id="btn-finish" disabled>Finish</button>
+  <button type="button" id="btn-undo" disabled>Delete last vertice</button>
+  <button type="button" id="btn-removeAllLayers" disabled>Remove all layers</button>
 </div>
 
 </body>
@@ -56,12 +58,17 @@
 	let options = {
 		position: "topright",
 		draw: {
-			customButtons: {
+			externalButtons: {
 				polyline: document.getElementById("btn-polyline"),
 				polygon: document.getElementById("btn-polygon"),
 				rectangle: document.getElementById("btn-rectangle"),
 				marker: document.getElementById("btn-marker"),
-				circlemarker: document.getElementById("btn-circlemarker")
+				circlemarker: document.getElementById("btn-circlemarker"),
+				actions: {
+					finish: document.getElementById("btn-finish"),
+					cancel: document.getElementById("btn-cancel"),
+					undo: document.getElementById("btn-undo")
+				}
 			},
 			polyline: {
 				shapeOptions: {
@@ -88,9 +95,14 @@
 			}
 		},
 		edit: {
-			customButtons: {
+			externalButtons: {
 				edit: document.getElementById("btn-edit"),
-				remove: document.getElementById("btn-remove")
+				remove: document.getElementById("btn-remove"),
+        actions: {
+					save: document.getElementById("btn-save"),
+					cancel: document.getElementById("btn-cancel"),
+					clearAll: document.getElementById("btn-removeAllLayers")
+        }
 			},
 			featureGroup: editableLayers, //REQUIRED!!
 			remove: true
@@ -117,28 +129,23 @@
 <script type="text/javascript">
 
 	const actions_btn = {
-		_save: document.getElementById("btn-save"),
-		disable: document.getElementById("btn-cancel"),
-		undo: document.getElementById("btn-undo")
+		finish: document.getElementById("btn-finish"),
+		cancel: document.getElementById("btn-cancel"),
+		undo: document.getElementById("btn-undo"),
+		save: document.getElementById("btn-save"),
+		clearAll: document.getElementById("btn-removeAllLayers")
 	};
 
 	map.addEventListener("draw:actionstart", (e) => {
-		console.log(e);
-		e.actions.map(ev => {
-			if (ev.callback) {
-				actions_btn[ev.callback.name].addEventListener("click", ev.callback.bind(ev.context));
-				actions_btn[ev.callback.name].disabled = false;
-			}
-		});
-
+		for (let action in e.actions) {
+			actions_btn[action].disabled = !e.actions[action];
+		}
 	});
 
-	map.addEventListener("draw:actionstop", (e) => {
-		console.log(e);
-		Object.keys(actions_btn).map(btn => {
-      actions_btn[btn].disabled = true;
-    });
-
+	map.addEventListener("draw:actionstop", () => {
+		for (let btn in actions_btn) {
+			actions_btn[btn].disabled = true;
+		}
 	});
 
 </script>

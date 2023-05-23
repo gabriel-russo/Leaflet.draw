@@ -74,6 +74,7 @@ L.DrawToolbar = L.Toolbar.extend({
 	getActions(handler) {
 		return [
 			{
+				type: "finish",
 				enabled: handler.completeShape,
 				title: L.drawLocal.draw.toolbar.finish.title,
 				text: L.drawLocal.draw.toolbar.finish.text,
@@ -81,6 +82,7 @@ L.DrawToolbar = L.Toolbar.extend({
 				context: handler
 			},
 			{
+				type: "undo",
 				enabled: handler.deleteLastVertex,
 				title: L.drawLocal.draw.toolbar.undo.title,
 				text: L.drawLocal.draw.toolbar.undo.text,
@@ -88,6 +90,8 @@ L.DrawToolbar = L.Toolbar.extend({
 				context: handler
 			},
 			{
+				type: "cancel",
+				enabled: this.disable,
 				title: L.drawLocal.draw.toolbar.actions.title,
 				text: L.drawLocal.draw.toolbar.actions.text,
 				callback: this.disable,
