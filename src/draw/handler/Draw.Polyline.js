@@ -108,7 +108,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 				.on("mousemove", this._onMouseMove, this)
 				.on("zoomlevelschange", this._onZoomEnd, this)
 				.on("touchstart", this._onTouch, this)
-				.on("zoomend", this._onZoomEnd, this);
+				.on("zoomend", this._onZoomEnd, this)
+				.on("keydown", this._bindKeyboardEvents, this);
 
 		}
 	},
@@ -147,7 +148,8 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 			.off("zoomlevelschange", this._onZoomEnd, this)
 			.off("zoomend", this._onZoomEnd, this)
 			.off("touchstart", this._onTouch, this)
-			.off("click", this._onTouch, this);
+			.off("click", this._onTouch, this)
+			.off("keydown", this._bindKeyboardEvents, this);
 	},
 
 	// @method deleteLastVertex(): void
@@ -589,5 +591,20 @@ L.Draw.Polyline = L.Draw.Feature.extend({
 	_fireCreatedEvent() {
 		let poly = new this.Poly(this._poly.getLatLngs(), this.options.shapeOptions);
 		L.Draw.Feature.prototype._fireCreatedEvent.call(this, poly);
+	},
+
+	_detectMac() {
+		return /Macintosh/.test(navigator.userAgent) && !window.MSStream;
+	},
+
+	_bindKeyboardEvents(e) {
+		let event = e.originalEvent;
+		let metaKey = this._detectMac() ? event.metaKey : event.ctrlKey;
+
+		if ((event.key === "z") && (metaKey)) {
+			this.deleteLastVertex();
+		}
+
+		// if (e.key === "Escape") -> Already implmented in L.Draw.Feature
 	}
 });
