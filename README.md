@@ -8,12 +8,20 @@ This fork of Leaflet.draw is a **work in progress**.
 - Code updated to ES5 javascript
 - Code compatible with leaflet 1.0.0+
 
+## Install
+
+```
+npm install leaflet-euclides
+```
+
 ## Preview
 
 ### With custom buttons
+
 ![Preview](docs/images/leaflet-euclides-preview.gif)
 
 ### Without custom buttons
+
 ![Preview 2](docs/images/leaflet-euclides-preview2.gif)
 
 ----
@@ -265,11 +273,15 @@ drawControl.setDrawingOptions({
 
 First, install npm dependencies:
 
-    npm install
+```
+npm install
+```
 
 and then use:
 
-    npm run build
+```
+npm run build
+```
 
 after that, you can get the code in `dist/` folder.
 
@@ -281,6 +293,8 @@ edit the code, repeat the previous steps and visualize in `index.html`.
 
 Documentation is build with Leafdoc, to generate the documentation use
 
-    npm run docs
+```
+npm run docs
+```
 
 and the generated html documentation is saved to `./docs/leaflet-draw-latest.html`

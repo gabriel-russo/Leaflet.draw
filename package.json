@@ -1,8 +1,11 @@
 {
-  "name": "leaflet-draw",
-  "version": "2.0.0",
-  "description": "Vector drawing plugin for Leaflet",
+  "name": "leaflet-euclides",
+  "version": "1.0.0",
+  "description": "Vector drawing plugin for Leaflet with external buttons option",
   "dependencies": {
+    "leaflet": ">=1.0.1"
+  },
+  "devDependencies": {
     "eslint": ">=3.5.0",
     "eslint-config-airbnb": ">=19.0.4",
     "eslint-config-mourner": ">=2.0.3",
@@ -10,7 +13,6 @@
     "git-rev": ">=0.2.1",
     "jake": ">=8.0.15",
     "leafdoc": ">=1.4.0",
-    "leaflet": ">=1.0.1",
     "source-map": ">=0.7.4",
     "uglify-js": ">=2.8.29",
     "uglifycss": ">=0.0.25"
@@ -34,7 +36,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gabriel-russo/Leaflet.draw.git"
+    "url": "https://github.com/gabriel-russo/leaflet-euclides.git"
   },
   "keywords": [
     "maps",
@@ -42,16 +44,11 @@
     "client",
     "vector",
     "drawing",
-    "draw"
+    "draw",
+    "gis",
+    "webgis"
   ],
   "contributors": [
-    {
-      "name": "Jon West",
-      "email": "ddproxy@gmail.com"
-    },
-    {
-      "name": "Jacob Toye"
-    },
     {
       "name": "Gabriel Russo",
       "email": "gabrielrusso@protonmail.com"
