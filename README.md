@@ -274,7 +274,7 @@ drawControl.setDrawingOptions({
 First, install npm dependencies:
 
 ```
-npm install
+npm install --save-dev
 ```
 
 and then use:

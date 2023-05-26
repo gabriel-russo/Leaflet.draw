@@ -18,7 +18,7 @@
 
 <body style="display: flex; justify-content: center; flex-direction: column; align-items: center;gap: 5px">
 <div>
-  <a href="no-buttons.html">Without Buttons</a>
+  <a href="index.html">With Buttons</a>
 </div>
 <div id="map" style="width: 95vw; height: 80vh"></div>
 <div style="display: flex; gap: 35px; border: 1px solid black; padding: 5px">
@@ -62,19 +62,6 @@
 	let options = {
 		position: "topright",
 		draw: {
-			externalButtons: {
-				polyline: document.getElementById("btn-polyline"),
-				polygon: document.getElementById("btn-polygon"),
-				rectangle: document.getElementById("btn-rectangle"),
-        circle: document.getElementById("btn-circle"),
-				marker: document.getElementById("btn-marker"),
-				circlemarker: document.getElementById("btn-circlemarker"),
-				actions: {
-					finish: document.getElementById("btn-finish"),
-					cancel: document.getElementById("btn-cancel"),
-					undo: document.getElementById("btn-undo")
-				}
-			},
 			polyline: {
 				shapeOptions: {
 					color: "#00ff00",
@@ -83,7 +70,7 @@
 			},
 			polygon: {
 				allowIntersection: false, // Restricts shapes to simple polygons
-        showArea: true,
+				showArea: true,
 				drawError: {
 					color: "#ff0000", // Color the shape will turn when intersects
 					message: "<strong>Oh snap!<strong> you can't draw that!" // Message that will show when intersect
@@ -101,15 +88,6 @@
 			}
 		},
 		edit: {
-			externalButtons: {
-				edit: document.getElementById("btn-edit"),
-				remove: document.getElementById("btn-remove"),
-				actions: {
-					save: document.getElementById("btn-save"),
-					cancel: document.getElementById("btn-cancel"),
-					clearAll: document.getElementById("btn-removeAllLayers")
-				}
-			},
 			featureGroup: editableLayers, //REQUIRED!!
 			remove: true
 		}
