@@ -14,105 +14,105 @@ L.Draw = L.Draw || {};
  *
  */
 L.Draw.Tooltip = L.Class.extend({
-	// @section Methods for modifying draw state
+  // @section Methods for modifying draw state
 
-	// @method initialize(map): void
-	// Tooltip constructor
-	initialize(map) {
-		this._map = map;
-		this._popupPane = map._panes.popupPane;
-		this._visible = false;
+  // @method initialize(map): void
+  // Tooltip constructor
+  initialize(map) {
+    this._map = map;
+    this._popupPane = map._panes.popupPane;
+    this._visible = false;
 
-		this._container = map.options.drawControlTooltips
-			? L.DomUtil.create("div", "leaflet-draw-tooltip", this._popupPane)
-			: null;
-		this._singleLineLabel = false;
+    this._container = map.options.drawControlTooltips
+      ? L.DomUtil.create("div", "leaflet-draw-tooltip", this._popupPane)
+      : null;
+    this._singleLineLabel = false;
 
-		this._map.on("mouseout", this._onMouseOut, this);
-	},
+    this._map.on("mouseout", this._onMouseOut, this);
+  },
 
-	// @method dispose(): void
-	// Remove Tooltip DOM and unbind events
-	dispose() {
-		this._map.off("mouseout", this._onMouseOut, this);
+  // @method dispose(): void
+  // Remove Tooltip DOM and unbind events
+  dispose() {
+    this._map.off("mouseout", this._onMouseOut, this);
 
-		if (this._container) {
-			this._popupPane.removeChild(this._container);
-			this._container = null;
-		}
-	},
+    if (this._container) {
+      this._popupPane.removeChild(this._container);
+      this._container = null;
+    }
+  },
 
-	// @method updateContent(labelText): this
-	// Changes the tooltip text to string in function call
-	updateContent(labelText) {
-		if (!this._container) {
-			return this;
-		}
-		labelText.subtext = labelText.subtext || "";
+  // @method updateContent(labelText): this
+  // Changes the tooltip text to string in function call
+  updateContent(labelText) {
+    if (!this._container) {
+      return this;
+    }
+    labelText.subtext = labelText.subtext || "";
 
-		// update the vertical position (only if changed)
-		if (labelText.subtext.length === 0 && !this._singleLineLabel) {
-			L.DomUtil.addClass(this._container, "leaflet-draw-tooltip-single");
-			this._singleLineLabel = true;
-		} else if (labelText.subtext.length > 0 && this._singleLineLabel) {
-			L.DomUtil.removeClass(this._container, "leaflet-draw-tooltip-single");
-			this._singleLineLabel = false;
-		}
+    // update the vertical position (only if changed)
+    if (labelText.subtext.length === 0 && !this._singleLineLabel) {
+      L.DomUtil.addClass(this._container, "leaflet-draw-tooltip-single");
+      this._singleLineLabel = true;
+    } else if (labelText.subtext.length > 0 && this._singleLineLabel) {
+      L.DomUtil.removeClass(this._container, "leaflet-draw-tooltip-single");
+      this._singleLineLabel = false;
+    }
 
-		this._container.innerHTML = `${
-			labelText.subtext.length > 0
-				? `<span class="leaflet-draw-tooltip-subtext">${labelText.subtext}</span> <br />`
-				: ""
-		}<span>${labelText.text}</span>`;
+    this._container.innerHTML = `${
+      labelText.subtext.length > 0
+        ? `<span class="leaflet-draw-tooltip-subtext">${labelText.subtext}</span> <br />`
+        : ""
+    }<span>${labelText.text}</span>`;
 
-		if (!labelText.text && !labelText.subtext) {
-			this._visible = false;
-			this._container.style.visibility = "hidden";
-		} else {
-			this._visible = true;
-			this._container.style.visibility = "inherit";
-		}
+    if (!labelText.text && !labelText.subtext) {
+      this._visible = false;
+      this._container.style.visibility = "hidden";
+    } else {
+      this._visible = true;
+      this._container.style.visibility = "inherit";
+    }
 
-		return this;
-	},
+    return this;
+  },
 
-	// @method updatePosition(latlng): this
-	// Changes the location of the tooltip
-	updatePosition(latlng) {
-		let pos = this._map.latLngToLayerPoint(latlng);
-		let tooltipContainer = this._container;
+  // @method updatePosition(latlng): this
+  // Changes the location of the tooltip
+  updatePosition(latlng) {
+    let pos = this._map.latLngToLayerPoint(latlng);
+    let tooltipContainer = this._container;
 
-		if (this._container) {
-			if (this._visible) {
-				tooltipContainer.style.visibility = "inherit";
-			}
-			L.DomUtil.setPosition(tooltipContainer, pos);
-		}
+    if (this._container) {
+      if (this._visible) {
+        tooltipContainer.style.visibility = "inherit";
+      }
+      L.DomUtil.setPosition(tooltipContainer, pos);
+    }
 
-		return this;
-	},
+    return this;
+  },
 
-	// @method showAsError(): this
-	// Applies error class to tooltip
-	showAsError() {
-		if (this._container) {
-			L.DomUtil.addClass(this._container, "leaflet-error-draw-tooltip");
-		}
-		return this;
-	},
+  // @method showAsError(): this
+  // Applies error class to tooltip
+  showAsError() {
+    if (this._container) {
+      L.DomUtil.addClass(this._container, "leaflet-error-draw-tooltip");
+    }
+    return this;
+  },
 
-	// @method removeError(): this
-	// Removes the error class from the tooltip
-	removeError() {
-		if (this._container) {
-			L.DomUtil.removeClass(this._container, "leaflet-error-draw-tooltip");
-		}
-		return this;
-	},
+  // @method removeError(): this
+  // Removes the error class from the tooltip
+  removeError() {
+    if (this._container) {
+      L.DomUtil.removeClass(this._container, "leaflet-error-draw-tooltip");
+    }
+    return this;
+  },
 
-	_onMouseOut() {
-		if (this._container) {
-			this._container.style.visibility = "hidden";
-		}
-	}
+  _onMouseOut() {
+    if (this._container) {
+      this._container.style.visibility = "hidden";
+    }
+  }
 });

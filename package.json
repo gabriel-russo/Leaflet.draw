@@ -1,6 +1,6 @@
 {
   "name": "leaflet-euclides",
-  "version": "1.0.0",
+  "version": "1.1.4",
   "description": "Vector drawing plugin for Leaflet with external buttons option",
   "dependencies": {
     "leaflet": ">=1.0.1"

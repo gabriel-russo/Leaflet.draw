@@ -26,11 +26,7 @@
       "smart-tabs"
     ],
     "indent": [
-      2,
-      "tab",
-      {
-        "VariableDeclarator": 0
-      }
+      2
     ],
     "curly": 2,
     "spaced-comment": 2,
@@ -49,5 +45,14 @@
     "commonjs": true,
     "amd": true,
     "node": false
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "paths": [
+          "src"
+        ]
+      }
+    }
   }
 }

@@ -70,156 +70,170 @@ The following example will show you how to:
 4. Disable the delete functionality.
 
 ```js
-    let cloudmadeUrl = "http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png",
-	cloudmade = new L.TileLayer(cloudmadeUrl, { maxZoom: 18 }),
-	map = new L.Map("map", { layers: [cloudmade], center: new L.LatLng(-37.7772, 175.2756), zoom: 15 });
+const cloudmadeUrl = "http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png";
 
-var editableLayers = new L.FeatureGroup();
+const cloudmade = new L.TileLayer(cloudmadeUrl, { maxZoom: 18 });
+  
+const map = new L.Map("map", { layers: [cloudmade], center: new L.LatLng(-37.7772, 175.2756), zoom: 15 });
+
+const editableLayers = new L.FeatureGroup();
+
 map.addLayer(editableLayers);
 
-var MyCustomMarker = L.Icon.extend({
-	options: {
-		shadowUrl: null,
-		iconAnchor: new L.Point(12, 12),
-		iconSize: new L.Point(24, 24),
-		iconUrl: "link/to/image.png"
-	}
+let MyCustomMarker = L.Icon.extend({
+  options: {
+    shadowUrl: null,
+    iconAnchor: new L.Point(12, 12),
+    iconSize: new L.Point(24, 24),
+    iconUrl: "link/to/image.png"
+  }
 });
 
-var options = {
-	position: "topright",
-	draw: {
-		polyline: {
-			shapeOptions: {
-				color: "#f357a1",
-				weight: 10
-			}
-		},
-		polygon: {
-			allowIntersection: false, // Restricts shapes to simple polygons
-			drawError: {
-				color: "#e1e100", // Color the shape will turn when intersects
-				message: "<strong>Oh snap!<strong> you can't draw that!" // Message that will show when intersect
-			},
-			shapeOptions: {
-				color: "#bada55"
-			}
-		},
-		circle: false, // Turns off this drawing tool
-		rectangle: {
-			shapeOptions: {
-				clickable: false
-			}
-		},
-		marker: {
-			icon: new MyCustomMarker()
-		}
-	},
-	edit: {
-		featureGroup: editableLayers, //REQUIRED!!
-		remove: false
-	}
+let options = {
+  position: "topright",
+  draw: {
+    polyline: {
+      shapeOptions: {
+        color: "#f357a1",
+        weight: 10
+      }
+    },
+    polygon: {
+      allowIntersection: false, // Restricts shapes to simple polygons
+      drawError: {
+        color: "#e1e100", // Color the shape will turn when intersects
+        message: "<strong>Oh snap!<strong> you can't draw that!" // Message that will show when intersect
+      },
+      shapeOptions: {
+        color: "#bada55"
+      }
+    },
+    circle: false, // Turns off this drawing tool
+    rectangle: {
+      shapeOptions: {
+        clickable: false
+      }
+    },
+    marker: {
+      icon: new MyCustomMarker()
+    }
+  },
+  edit: {
+    featureGroup: editableLayers, //REQUIRED!!
+    remove: false
+  }
 };
 
-var drawControl = new L.Control.Draw(options);
+let drawControl = new L.Control.Draw(options);
 map.addControl(drawControl);
 
-map.on(L.Draw.Event.CREATED, function(e) {
-	var type = e.layerType,
-		layer = e.layer;
+map.on(L.Draw.Event.CREATED, (e) => {
+  let type = e.layerType;
+  let layer = e.layer;
 
-	if (type === "marker") {
-		layer.bindPopup("A popup!");
-	}
+  if (type === "marker") {
+    layer.bindPopup("A popup!");
+  }
 
-	editableLayers.addLayer(layer);
+  editableLayers.addLayer(layer);
 });
 ```
 
-## Example Leaflet-Euclides config - Enable External Buttons
+## Example Leaflet-Euclides config - Bind Handlers and actions on External Buttons
 
 ```js
 let osm = L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-	attribution: "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"
+  attribution: "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"
 });
 
 let map = new L.Map("map", {
-	layers: [osm],
-	center: new L.LatLng(-37.7772, 175.2756),
-	zoom: 15,
-	renderer: L.canvas()
+  layers: [osm],
+  center: new L.LatLng(-37.7772, 175.2756),
+  zoom: 15,
+  renderer: L.canvas()
 });
 
 let editableLayers = new L.FeatureGroup();
 map.addLayer(editableLayers);
 
 let options = {
-	position: "topright",
-	draw: {
-		externalButtons: {
-			polyline: document.getElementById("btn-polyline"),
-			polygon: document.getElementById("btn-polygon"),
-			rectangle: document.getElementById("btn-rectangle"),
-			marker: document.getElementById("btn-marker"),
-			circlemarker: document.getElementById("btn-circlemarker"),
-			actions: {
-				finish: document.getElementById("btn-finish"),
-				cancel: document.getElementById("btn-cancel"),
-				undo: document.getElementById("btn-undo")
-			}
-		},
-		polyline: {
-			shapeOptions: {
-				color: "#f357a1",
-				weight: 10
-			}
-		},
-		polygon: {
-			allowIntersection: false, // Restricts shapes to simple polygons
-			drawError: {
-				color: "#ff0000", // Color the shape will turn when intersects
-				message: "<strong>Oh snap!<strong> you can't draw that!" // Message that will show when intersect
-			},
-			shapeOptions: {
-				color: "#0000ff"
-			}
-		},
-		circle: false, // Turns off this drawing tool
-		rectangle: {
-			shapeOptions: {
-				clickable: true,
-				editable: false
-			}
-		}
-	},
-	edit: {
-		externalButtons: {
-			edit: document.getElementById("btn-edit"),
-			remove: document.getElementById("btn-remove"),
-			actions: {
-				save: document.getElementById("btn-save"),
-				cancel: document.getElementById("btn-cancel"),
-				clearAll: document.getElementById("btn-removeAllLayers")
-			}
-		},
-		featureGroup: editableLayers, //REQUIRED!!
-		remove: true
-	}
+  position: "topright",
+  draw: {
+    externalButtons: {
+      polyline: document.getElementById("btn-polyline"),
+      polygon: document.getElementById("btn-polygon"),
+      rectangle: document.getElementById("btn-rectangle"),
+      marker: document.getElementById("btn-marker"),
+      circlemarker: document.getElementById("btn-circlemarker"),
+      actions: {
+        finish: document.getElementById("btn-finish"),
+        cancel: document.getElementById("btn-cancel"),
+        undo: document.getElementById("btn-undo")
+      }
+    },
+    polyline: {
+      shapeOptions: {
+        color: "#ff0000",
+        weight: 5
+      },
+      showLength: true,
+      icon: new L.DivIcon({
+        iconSize: new L.Point(8, 8),
+        className: 'leaflet-div-icon leaflet-editing-icon'
+      }),
+    },
+    polygon: {
+      allowIntersection: false, // Restricts shapes to simple polygons
+      showArea: true,
+      drawError: {
+        color: "#ff0000", // Color the shape will turn when intersects
+        message: "<strong>Oh snap!<strong> you can't draw that!" // Message that will show when intersect
+      },
+      shapeOptions: {
+        color: "#0000ff"
+      },
+      icon: new L.DivIcon({
+        iconSize: new L.Point(9, 9),
+        className: 'leaflet-div-icon leaflet-editing-icon'
+      }),
+    },
+    circle: false, // Turns off this drawing tool
+    rectangle: {
+      shapeOptions: {
+        clickable: true,
+        editable: false,
+      }
+    }
+  },
+  edit: {
+    externalButtons: { // To deactivate the edit Tools, just make this object empty (ex.: externalButtons: {}) and edit and remove equals false
+      edit: document.getElementById("btn-edit"),
+      // remove: document.getElementById("btn-remove"),
+      actions: {
+        save: document.getElementById("btn-save"),
+        cancel: document.getElementById("btn-cancel"),
+        // clearAll: document.getElementById("btn-removeAllLayers") // You can bind only the buttons you'll use
+      }
+    },
+    featureGroup: editableLayers, //REQUIRED!!
+    // edit: false,
+    remove: false
+  }
 };
 
 let drawControl = new L.Control.Draw(options);
 
 map.addControl(drawControl);
 
-map.on(L.Draw.Event.CREATED, function(e) {
-	let type = e.layerType,
-		layer = e.layer;
+map.on(L.Draw.Event.CREATED, function (e) {
+  let type = e.layerType,
+    layer = e.layer;
 
-	if (type === "marker") {
-		layer.bindPopup("A popup!");
-	}
+  if (type === "marker") {
+    layer.bindPopup("A popup!");
+  }
 
-	editableLayers.addLayer(layer);
+  editableLayers.addLayer(layer);
 });
 
 
@@ -259,11 +273,11 @@ E.g. to change the colour of the rectangle:
 
 ```js
 drawControl.setDrawingOptions({
-	rectangle: {
-		shapeOptions: {
-			color: '#0000FF'
-		}
-	}
+  rectangle: {
+    shapeOptions: {
+      color: '#0000FF'
+    }
+  }
 });
 ```
 

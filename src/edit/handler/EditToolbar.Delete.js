@@ -3,159 +3,159 @@
  * @aka EditToolbar.Delete
  */
 L.EditToolbar.Delete = L.Handler.extend({
-	statics: {
-		TYPE: "remove" // not delete as delete is reserved in js
-	},
+  statics: {
+    TYPE: "remove" // not delete as delete is reserved in js
+  },
 
-	// @method intialize(): void
-	initialize(map, options) {
-		L.Handler.prototype.initialize.call(this, map);
+  // @method intialize(): void
+  initialize(map, options) {
+    L.Handler.prototype.initialize.call(this, map);
 
-		L.Util.setOptions(this, options);
+    L.Util.setOptions(this, options);
 
-		// Store the selectable layer group for ease of access
-		this._deletableLayers = this.options.featureGroup;
+    // Store the selectable layer group for ease of access
+    this._deletableLayers = this.options.featureGroup;
 
-		if (!(this._deletableLayers instanceof L.FeatureGroup)) {
-			throw new Error("options.featureGroup must be a L.FeatureGroup");
-		}
+    if (!(this._deletableLayers instanceof L.FeatureGroup)) {
+      throw new Error("options.featureGroup must be a L.FeatureGroup");
+    }
 
-		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
-		this.type = L.EditToolbar.Delete.TYPE;
+    // Save the type so super can fire, need to do this as cannot do this.TYPE :(
+    this.type = L.EditToolbar.Delete.TYPE;
 
-		let version = L.version.split(".");
-		// If Version is >= 1.2.0
-		if (parseInt(version[0], 10) === 1 && parseInt(version[1], 10) >= 2) {
-			L.EditToolbar.Delete.include(L.Evented.prototype);
-		} else {
-			L.EditToolbar.Delete.include(L.Mixin.Events);
-		}
+    let version = L.version.split(".");
+    // If Version is >= 1.2.0
+    if (parseInt(version[0], 10) === 1 && parseInt(version[1], 10) >= 2) {
+      L.EditToolbar.Delete.include(L.Evented.prototype);
+    } else {
+      L.EditToolbar.Delete.include(L.Mixin.Events);
+    }
 
-	},
+  },
 
-	// @method enable(): void
-	// Enable the delete toolbar
-	enable() {
-		if (this._enabled || !this._hasAvailableLayers()) {
-			return;
-		}
-		this.fire("enabled", { handler: this.type });
+  // @method enable(): void
+  // Enable the delete toolbar
+  enable() {
+    if (this._enabled || !this._hasAvailableLayers()) {
+      return;
+    }
+    this.fire("enabled", {handler: this.type});
 
-		this._map.fire(L.Draw.Event.DELETESTART, { handler: this.type });
+    this._map.fire(L.Draw.Event.DELETESTART, {handler: this.type});
 
-		L.Handler.prototype.enable.call(this);
+    L.Handler.prototype.enable.call(this);
 
-		this._deletableLayers
-			.on("layeradd", this._enableLayerDelete, this)
-			.on("layerremove", this._disableLayerDelete, this);
-	},
+    this._deletableLayers
+      .on("layeradd", this._enableLayerDelete, this)
+      .on("layerremove", this._disableLayerDelete, this);
+  },
 
-	// @method disable(): void
-	// Disable the delete toolbar
-	disable() {
-		if (!this._enabled) {
-			return;
-		}
+  // @method disable(): void
+  // Disable the delete toolbar
+  disable() {
+    if (!this._enabled) {
+      return;
+    }
 
-		this._deletableLayers
-			.off("layeradd", this._enableLayerDelete, this)
-			.off("layerremove", this._disableLayerDelete, this);
+    this._deletableLayers
+      .off("layeradd", this._enableLayerDelete, this)
+      .off("layerremove", this._disableLayerDelete, this);
 
-		L.Handler.prototype.disable.call(this);
+    L.Handler.prototype.disable.call(this);
 
-		this._map.fire(L.Draw.Event.DELETESTOP, { handler: this.type });
+    this._map.fire(L.Draw.Event.DELETESTOP, {handler: this.type});
 
-		this.fire("disabled", { handler: this.type });
-	},
+    this.fire("disabled", {handler: this.type});
+  },
 
-	// @method addHooks(): void
-	// Add listener hooks to this handler
-	addHooks() {
-		let map = this._map;
+  // @method addHooks(): void
+  // Add listener hooks to this handler
+  addHooks() {
+    let map = this._map;
 
-		if (map) {
-			map.getContainer().focus();
+    if (map) {
+      map.getContainer().focus();
 
-			this._deletableLayers.eachLayer(this._enableLayerDelete, this);
-			this._deletedLayers = new L.LayerGroup();
+      this._deletableLayers.eachLayer(this._enableLayerDelete, this);
+      this._deletedLayers = new L.LayerGroup();
 
-			this._tooltip = new L.Draw.Tooltip(this._map);
-			this._tooltip.updateContent({ text: L.drawLocal.edit.handlers.remove.tooltip.text });
+      this._tooltip = new L.Draw.Tooltip(this._map);
+      this._tooltip.updateContent({text: L.drawLocal.edit.handlers.remove.tooltip.text});
 
-			this._map.on("mousemove", this._onMouseMove, this);
-		}
-	},
+      this._map.on("mousemove", this._onMouseMove, this);
+    }
+  },
 
-	// @method removeHooks(): void
-	// Remove listener hooks from this handler
-	removeHooks() {
-		if (this._map) {
-			this._deletableLayers.eachLayer(this._disableLayerDelete, this);
-			this._deletedLayers = null;
+  // @method removeHooks(): void
+  // Remove listener hooks from this handler
+  removeHooks() {
+    if (this._map) {
+      this._deletableLayers.eachLayer(this._disableLayerDelete, this);
+      this._deletedLayers = null;
 
-			this._tooltip.dispose();
-			this._tooltip = null;
+      this._tooltip.dispose();
+      this._tooltip = null;
 
-			this._map.off("mousemove", this._onMouseMove, this);
-		}
-	},
+      this._map.off("mousemove", this._onMouseMove, this);
+    }
+  },
 
-	// @method revertLayers(): void
-	// Revert the deleted layers back to their prior state.
-	revertLayers() {
-		// Iterate of the deleted layers and add them back into the featureGroup
-		this._deletedLayers.eachLayer((layer) => {
-			this._deletableLayers.addLayer(layer);
-			layer.fire("revert-deleted", { layer });
-		}, this);
-	},
+  // @method revertLayers(): void
+  // Revert the deleted layers back to their prior state.
+  revertLayers() {
+    // Iterate of the deleted layers and add them back into the featureGroup
+    this._deletedLayers.eachLayer((layer) => {
+      this._deletableLayers.addLayer(layer);
+      layer.fire("revert-deleted", {layer});
+    }, this);
+  },
 
-	// @method save(): void
-	// Save deleted layers
-	save() {
-		this._map.fire(L.Draw.Event.DELETED, { layers: this._deletedLayers });
-	},
+  // @method save(): void
+  // Save deleted layers
+  save() {
+    this._map.fire(L.Draw.Event.DELETED, {layers: this._deletedLayers});
+  },
 
-	// @method removeAllLayers(): void
-	// Remove all delateable layers
-	removeAllLayers() {
-		// Iterate of the delateable layers and add remove them
-		this._deletableLayers.eachLayer((layer) => {
-			this._removeLayer({ layer });
-		}, this);
-		this.save();
-	},
+  // @method removeAllLayers(): void
+  // Remove all delateable layers
+  removeAllLayers() {
+    // Iterate of the delateable layers and add remove them
+    this._deletableLayers.eachLayer((layer) => {
+      this._removeLayer({layer});
+    }, this);
+    this.save();
+  },
 
-	_enableLayerDelete(e) {
-		let layer = e.layer || e.target || e;
+  _enableLayerDelete(e) {
+    let layer = e.layer || e.target || e;
 
-		layer.on("click", this._removeLayer, this);
-	},
+    layer.on("click", this._removeLayer, this);
+  },
 
-	_disableLayerDelete(e) {
-		let layer = e.layer || e.target || e;
+  _disableLayerDelete(e) {
+    let layer = e.layer || e.target || e;
 
-		layer.off("click", this._removeLayer, this);
+    layer.off("click", this._removeLayer, this);
 
-		// Remove from the deleted layers so we can't accidentally revert if the user presses cancel
-		this._deletedLayers.removeLayer(layer);
-	},
+    // Remove from the deleted layers so we can't accidentally revert if the user presses cancel
+    this._deletedLayers.removeLayer(layer);
+  },
 
-	_removeLayer(e) {
-		let layer = e.layer || e.target || e;
+  _removeLayer(e) {
+    let layer = e.layer || e.target || e;
 
-		this._deletableLayers.removeLayer(layer);
+    this._deletableLayers.removeLayer(layer);
 
-		this._deletedLayers.addLayer(layer);
+    this._deletedLayers.addLayer(layer);
 
-		layer.fire("deleted");
-	},
+    layer.fire("deleted");
+  },
 
-	_onMouseMove(e) {
-		this._tooltip.updatePosition(e.latlng);
-	},
+  _onMouseMove(e) {
+    this._tooltip.updatePosition(e.latlng);
+  },
 
-	_hasAvailableLayers() {
-		return this._deletableLayers.getLayers().length !== 0;
-	}
+  _hasAvailableLayers() {
+    return this._deletableLayers.getLayers().length !== 0;
+  }
 });

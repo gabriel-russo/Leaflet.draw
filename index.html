@@ -1,156 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-  <!-- LEAFLET SOURCE    -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
-          integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
-        integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- LEAFLET SOURCE    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
+            integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+          integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
-  <!-- Your Leaflet Draw build -->
-  <script type="text/javascript" src="./dist/leaflet.draw-src.js"></script>
-  <link rel="stylesheet" href="./dist/leaflet.draw-src.css">
+    <!-- Your Leaflet Draw build -->
+    <script type="text/javascript" src="./dist/leaflet.draw-src.js"></script>
+    <link rel="stylesheet" href="./dist/leaflet.draw-src.css">
 </head>
 
 <body style="display: flex; justify-content: center; flex-direction: column; align-items: center;gap: 5px">
 <div id="map" style="width: 95vw; height: 80vh"></div>
 <div style="display: flex; gap: 35px; border: 1px solid black; padding: 5px">
-  <button type="button" id="btn-polyline">PolyLine</button>
-  <button type="button" id="btn-polygon">Polygon</button>
-  <button type="button" id="btn-rectangle">Rectangle</button>
-  <button type="button" id="btn-marker">Marker</button>
-  <button type="button" id="btn-circlemarker">CircleMarker</button>
+    <button type="button" id="btn-polyline">PolyLine</button>
+    <button type="button" id="btn-polygon">Polygon</button>
+    <button type="button" id="btn-rectangle">Rectangle</button>
+    <button type="button" id="btn-marker">Marker</button>
+    <button type="button" id="btn-circlemarker">CircleMarker</button>
 </div>
 <div style="border: 1px solid black;padding: 5px">
-  <button type="button" id="btn-edit">Edit mode</button>
-  <button type="button" id="btn-remove">Delete mode</button>
+    <button type="button" id="btn-edit">Edit mode</button>
+    <button type="button" id="btn-remove">Delete mode</button>
 </div>
 <div style="border: 1px solid black;padding: 5px">
-  <button type="button" id="btn-save" disabled>Save</button>
-  <button type="button" id="btn-cancel" disabled>Cancel</button>
-  <button type="button" id="btn-finish" disabled>Finish</button>
-  <button type="button" id="btn-undo" disabled>Delete last vertice</button>
-  <button type="button" id="btn-removeAllLayers" disabled>Remove all layers</button>
+    <button type="button" id="btn-save" disabled>Save</button>
+    <button type="button" id="btn-cancel" disabled>Cancel</button>
+    <button type="button" id="btn-finish" disabled>Finish</button>
+    <button type="button" id="btn-undo" disabled>Delete last vertice</button>
+    <button type="button" id="btn-removeAllLayers" disabled>Remove all layers</button>
 </div>
 
 </body>
 
 <script type="text/javascript">
 
-	let osm = L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-		attribution: "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"
-	});
+  let osm = L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"
+  });
 
-	let map = new L.Map("map", {
-		layers: [osm],
-		center: new L.LatLng(-37.7772, 175.2756),
-		zoom: 15,
-		renderer: L.canvas()
-	});
+  let map = new L.Map("map", {
+    layers: [osm],
+    center: new L.LatLng(-37.7772, 175.2756),
+    zoom: 15,
+    renderer: L.canvas()
+  });
 
-	let editableLayers = new L.FeatureGroup();
-	map.addLayer(editableLayers);
+  let editableLayers = new L.FeatureGroup();
+  map.addLayer(editableLayers);
 
-	let options = {
-		position: "topright",
-		draw: {
-			externalButtons: {
-				polyline: document.getElementById("btn-polyline"),
-				polygon: document.getElementById("btn-polygon"),
-				rectangle: document.getElementById("btn-rectangle"),
-				marker: document.getElementById("btn-marker"),
-				circlemarker: document.getElementById("btn-circlemarker"),
-				actions: {
-					finish: document.getElementById("btn-finish"),
-					cancel: document.getElementById("btn-cancel"),
-					undo: document.getElementById("btn-undo")
-				}
-			},
-			polyline: {
-				shapeOptions: {
-					color: "#f357a1",
-					weight: 10
-				}
-			},
-			polygon: {
-				allowIntersection: false, // Restricts shapes to simple polygons
-				drawError: {
-					color: "#ff0000", // Color the shape will turn when intersects
-					message: "<strong>Oh snap!<strong> you can't draw that!" // Message that will show when intersect
-				},
-				shapeOptions: {
-					color: "#0000ff"
-				}
-			},
-			circle: false, // Turns off this drawing tool
-			rectangle: {
-				shapeOptions: {
-					clickable: true,
-					editable: false
-				}
-			}
-		},
-		edit: {
-			externalButtons: {
-				edit: document.getElementById("btn-edit"),
-				remove: document.getElementById("btn-remove"),
+  let options = {
+    position: "topright",
+    draw: {
+      externalButtons: {
+        polyline: document.getElementById("btn-polyline"),
+        polygon: document.getElementById("btn-polygon"),
+        rectangle: document.getElementById("btn-rectangle"),
+        marker: document.getElementById("btn-marker"),
+        circlemarker: document.getElementById("btn-circlemarker"),
         actions: {
-					save: document.getElementById("btn-save"),
-					cancel: document.getElementById("btn-cancel"),
-					clearAll: document.getElementById("btn-removeAllLayers")
+          finish: document.getElementById("btn-finish"),
+          cancel: document.getElementById("btn-cancel"),
+          undo: document.getElementById("btn-undo")
         }
-			},
-			featureGroup: editableLayers, //REQUIRED!!
-			remove: true
-		}
-	};
+      },
+      polyline: {
+        shapeOptions: {
+          color: "#ff0000",
+          weight: 5
+        },
+        showLength: true,
+        icon: new L.DivIcon({
+          iconSize: new L.Point(8, 8),
+          className: 'leaflet-div-icon leaflet-editing-icon'
+        }),
+      },
+      polygon: {
+        allowIntersection: false, // Restricts shapes to simple polygons
+        showArea: true,
+        drawError: {
+          color: "#ff0000", // Color the shape will turn when intersects
+          message: "<strong>Oh snap!<strong> you can't draw that!" // Message that will show when intersect
+        },
+        shapeOptions: {
+          color: "#0000ff"
+        },
+        icon: new L.DivIcon({
+          iconSize: new L.Point(9, 9),
+          className: 'leaflet-div-icon leaflet-editing-icon'
+        }),
+      },
+      circle: false, // Turns off this drawing tool
+      rectangle: {
+        shapeOptions: {
+          clickable: true,
+          editable: false,
+        }
+      }
+    },
+    edit: {
+      externalButtons: { // To deactivate the edit Tools, just make this object empty (ex.: externalButtons: {}) and edit and remove equals false
+        edit: document.getElementById("btn-edit"),
+        // remove: document.getElementById("btn-remove"),
+        actions: {
+          save: document.getElementById("btn-save"),
+          cancel: document.getElementById("btn-cancel"),
+          // clearAll: document.getElementById("btn-removeAllLayers") // You can bind only the buttons you'll use
+        }
+      },
+      featureGroup: editableLayers, //REQUIRED!!
+      // edit: false,
+      remove: false
+    }
+  };
 
-	let drawControl = new L.Control.Draw(options);
+  let drawControl = new L.Control.Draw(options);
 
-	map.addControl(drawControl);
+  map.addControl(drawControl);
 
-	map.on(L.Draw.Event.CREATED, function(e) {
-		let type = e.layerType,
-			layer = e.layer;
+  map.on(L.Draw.Event.CREATED, function (e) {
+    let type = e.layerType,
+      layer = e.layer;
 
-		if (type === "marker") {
-			layer.bindPopup("A popup!");
-		}
+    if (type === "marker") {
+      layer.bindPopup("A popup!");
+    }
 
-		editableLayers.addLayer(layer);
-	});
+    editableLayers.addLayer(layer);
+  });
 
 </script>
 
 <script type="text/javascript">
 
-	const actions_btn = {
-		finish: document.getElementById("btn-finish"),
-		cancel: document.getElementById("btn-cancel"),
-		undo: document.getElementById("btn-undo"),
-		save: document.getElementById("btn-save"),
-		clearAll: document.getElementById("btn-removeAllLayers")
-	};
+  const actions_btn = {
+    finish: document.getElementById("btn-finish"),
+    cancel: document.getElementById("btn-cancel"),
+    undo: document.getElementById("btn-undo"),
+    save: document.getElementById("btn-save"),
+    clearAll: document.getElementById("btn-removeAllLayers")
+  };
 
-	map.addEventListener("draw:actionstart", (e) => {
+  map.addEventListener("draw:actionstart", (e) => {
 
-		for (let action in e.actions) {
-			actions_btn[action].disabled = !e.actions[action];
-		}
+    for (let action in e.actions) {
+      actions_btn[action].disabled = !e.actions[action];
+    }
 
-	});
+  });
 
-	map.addEventListener("draw:actionstop", (e) => {
+  map.addEventListener("draw:actionstop", (e) => {
 
-		for (let btn in actions_btn) {
-			actions_btn[btn].disabled = true;
-		}
+    for (let btn in actions_btn) {
+      actions_btn[btn].disabled = true;
+    }
 
-	});
+  });
 
 </script>
 
